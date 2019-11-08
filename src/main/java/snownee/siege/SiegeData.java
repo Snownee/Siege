@@ -11,13 +11,14 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.INBTSerializable;
+import snownee.siege.block.BlockInfo;
 
-public class BreakingProgress implements IBreakingProgress, INBTSerializable<CompoundNBT> {
+public class SiegeData implements ISiegeData, INBTSerializable<CompoundNBT> {
 
     public final Map<BlockPos, BlockInfo> progressData = Maps.newLinkedHashMap();
     private final Chunk chunk;
 
-    public BreakingProgress(Chunk chunk) {
+    public SiegeData(Chunk chunk) {
         this.chunk = chunk;
     }
 

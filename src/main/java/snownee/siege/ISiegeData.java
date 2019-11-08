@@ -5,8 +5,9 @@ import java.util.Map;
 import com.google.common.base.Optional;
 
 import net.minecraft.util.math.BlockPos;
+import snownee.siege.block.BlockInfo;
 
-public interface IBreakingProgress {
+public interface ISiegeData {
 
     Optional<BlockInfo> getInfo(BlockPos pos);
 

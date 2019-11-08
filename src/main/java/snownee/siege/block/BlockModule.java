@@ -1,4 +1,4 @@
-package snownee.siege;
+package snownee.siege.block;
 
 import javax.annotation.Nullable;
 
@@ -15,15 +15,22 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import snownee.kiwi.AbstractModule;
 import snownee.kiwi.KiwiModule;
+import snownee.kiwi.schedule.Scheduler;
+import snownee.kiwi.schedule.impl.SimpleGlobalTask;
+import snownee.siege.ISiegeData;
+import snownee.siege.SiegeCapabilities;
+import snownee.siege.SiegeDataProvider;
 
 @KiwiModule
 @KiwiModule.Subscriber
-public class SiegeModule extends AbstractModule {
+public class BlockModule extends AbstractModule {
 
     @Override
     protected void init(FMLCommonSetupEvent event) {
@@ -31,9 +38,9 @@ public class SiegeModule extends AbstractModule {
     }
 
     @Nullable
-    public static Optional<BlockInfo> getProgress(World world, BlockPos pos) {
+    public static Optional<BlockInfo> getBlockInfo(World world, BlockPos pos) {
         Chunk chunk = world.getChunkAt(pos);
-        IBreakingProgress progress = chunk.getCapability(SiegeCapabilities.BREAKING_PROGRESS).orElse(null);
+        ISiegeData progress = chunk.getCapability(SiegeCapabilities.BREAKING_PROGRESS).orElse(null);
         if (progress != null) {
             //return progress.progressData.get(pos);
         }
@@ -42,7 +49,7 @@ public class SiegeModule extends AbstractModule {
 
     @SubscribeEvent
     public void attachCap(AttachCapabilitiesEvent<Chunk> event) {
-        event.addCapability(SiegeCapabilities.PROGRESS_ID, new BreakingProgressProvider(event.getObject()));
+        event.addCapability(SiegeCapabilities.PROGRESS_ID, new SiegeDataProvider(event.getObject()));
     }
 
     @SubscribeEvent
@@ -58,14 +65,15 @@ public class SiegeModule extends AbstractModule {
         if (!state.isSolid()) {
             return;
         }
-        IBreakingProgress progress = chunk.getCapability(SiegeCapabilities.BREAKING_PROGRESS).orElse(null);
+        ISiegeData progress = chunk.getCapability(SiegeCapabilities.BREAKING_PROGRESS).orElse(null);
         if (progress != null) {
             double vel = entity.getMotion().squareDistanceTo(Vec3d.ZERO);
-            //progress.destroy(trace.getPos(), (float) vel * .1f);
             progress.destroy(trace.getPos(), (float) vel);
-            if (entity instanceof AbstractArrowEntity) {
-                event.setCanceled(true);
-                //((AbstractArrowEntity) entity).inBlockState = state;
+            if (!world.isRemote && entity instanceof AbstractArrowEntity) {
+                Scheduler.add(new SimpleGlobalTask(LogicalSide.SERVER, Phase.END, $ -> {
+                    ((AbstractArrowEntity) entity).inBlockState = null;
+                    return true;
+                }));
             }
         }
     }

@@ -1,4 +1,4 @@
-package snownee.siege;
+package snownee.siege.block;
 
 import net.minecraft.block.Blocks;
 

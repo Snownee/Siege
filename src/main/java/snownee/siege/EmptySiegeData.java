@@ -6,11 +6,13 @@ import java.util.Map;
 import com.google.common.base.Optional;
 
 import net.minecraft.util.math.BlockPos;
+import snownee.siege.block.BlockInfo;
+import snownee.siege.block.VoidBlockInfo;
 
-public final class VoidBreakingProgress implements IBreakingProgress {
-    public static final VoidBreakingProgress INSTANCE = new VoidBreakingProgress();
+public final class EmptySiegeData implements ISiegeData {
+    public static final EmptySiegeData INSTANCE = new EmptySiegeData();
 
-    private VoidBreakingProgress() {}
+    private EmptySiegeData() {}
 
     @Override
     public boolean destroy(BlockPos pos, float f) {

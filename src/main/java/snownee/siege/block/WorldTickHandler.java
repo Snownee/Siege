@@ -1,4 +1,4 @@
-package snownee.siege;
+package snownee.siege.block;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -13,6 +13,7 @@ import net.minecraft.world.server.ChunkManager;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import snownee.siege.SiegeCapabilities;
 
 public class WorldTickHandler {
 
