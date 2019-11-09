@@ -1,25 +1,26 @@
-package snownee.siege;
+package snownee.siege.block;
 
 import net.minecraft.util.Direction;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
+import snownee.siege.SiegeCapabilities;
 
-public class SiegeDataProvider implements ICapabilityProvider {
+public class BlockProgressProvider implements ICapabilityProvider {
 
     private final Chunk chunk;
-    private SiegeData progress;
+    private BlockProgress progress;
 
-    public SiegeDataProvider(Chunk chunk) {
+    public BlockProgressProvider(Chunk chunk) {
         this.chunk = chunk;
     }
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
-        return SiegeCapabilities.BREAKING_PROGRESS.orEmpty(cap, LazyOptional.of(() -> {
+        return SiegeCapabilities.BLOCK_PROGRESS.orEmpty(cap, LazyOptional.of(() -> {
             if (progress == null) {
-                progress = new SiegeData(chunk);
+                progress = new BlockProgress(chunk);
             }
             return progress;
         }));

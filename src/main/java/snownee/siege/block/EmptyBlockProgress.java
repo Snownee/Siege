@@ -1,4 +1,4 @@
-package snownee.siege;
+package snownee.siege.block;
 
 import java.util.Collections;
 import java.util.Map;
@@ -6,13 +6,11 @@ import java.util.Map;
 import com.google.common.base.Optional;
 
 import net.minecraft.util.math.BlockPos;
-import snownee.siege.block.BlockInfo;
-import snownee.siege.block.VoidBlockInfo;
 
-public final class EmptySiegeData implements ISiegeData {
-    public static final EmptySiegeData INSTANCE = new EmptySiegeData();
+public final class EmptyBlockProgress implements IBlockProgress {
+    public static final EmptyBlockProgress INSTANCE = new EmptyBlockProgress();
 
-    private EmptySiegeData() {}
+    private EmptyBlockProgress() {}
 
     @Override
     public boolean destroy(BlockPos pos, float f) {
@@ -26,7 +24,7 @@ public final class EmptySiegeData implements ISiegeData {
 
     @Override
     public BlockInfo getOrCreateInfo(BlockPos pos) {
-        return VoidBlockInfo.INSTANCE;
+        return EmptyBlockInfo.INSTANCE;
     }
 
     @Override

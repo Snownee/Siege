@@ -2,10 +2,10 @@ package snownee.siege.block;
 
 import net.minecraft.block.Blocks;
 
-public class VoidBlockInfo extends BlockInfo {
-    public static final VoidBlockInfo INSTANCE = new VoidBlockInfo();
+public class EmptyBlockInfo extends BlockInfo {
+    public static final EmptyBlockInfo INSTANCE = new EmptyBlockInfo();
 
-    private VoidBlockInfo() {
+    private EmptyBlockInfo() {
         blockstate = Blocks.AIR.getDefaultState();
     }
 

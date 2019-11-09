@@ -24,9 +24,7 @@ import snownee.kiwi.AbstractModule;
 import snownee.kiwi.KiwiModule;
 import snownee.kiwi.schedule.Scheduler;
 import snownee.kiwi.schedule.impl.SimpleGlobalTask;
-import snownee.siege.ISiegeData;
 import snownee.siege.SiegeCapabilities;
-import snownee.siege.SiegeDataProvider;
 
 @KiwiModule
 @KiwiModule.Subscriber
@@ -40,8 +38,8 @@ public class BlockModule extends AbstractModule {
     @Nullable
     public static Optional<BlockInfo> getBlockInfo(World world, BlockPos pos) {
         Chunk chunk = world.getChunkAt(pos);
-        ISiegeData progress = chunk.getCapability(SiegeCapabilities.BREAKING_PROGRESS).orElse(null);
-        if (progress != null) {
+        IBlockProgress data = chunk.getCapability(SiegeCapabilities.BLOCK_PROGRESS).orElse(null);
+        if (data != null) {
             //return progress.progressData.get(pos);
         }
         return null;
@@ -49,7 +47,7 @@ public class BlockModule extends AbstractModule {
 
     @SubscribeEvent
     public void attachCap(AttachCapabilitiesEvent<Chunk> event) {
-        event.addCapability(SiegeCapabilities.PROGRESS_ID, new SiegeDataProvider(event.getObject()));
+        event.addCapability(SiegeCapabilities.PROGRESS_ID, new BlockProgressProvider(event.getObject()));
     }
 
     @SubscribeEvent
@@ -65,10 +63,10 @@ public class BlockModule extends AbstractModule {
         if (!state.isSolid()) {
             return;
         }
-        ISiegeData progress = chunk.getCapability(SiegeCapabilities.BREAKING_PROGRESS).orElse(null);
-        if (progress != null) {
+        IBlockProgress data = chunk.getCapability(SiegeCapabilities.BLOCK_PROGRESS).orElse(null);
+        if (data != null) {
             double vel = entity.getMotion().squareDistanceTo(Vec3d.ZERO);
-            progress.destroy(trace.getPos(), (float) vel);
+            data.destroy(trace.getPos(), (float) vel);
             if (!world.isRemote && entity instanceof AbstractArrowEntity) {
                 Scheduler.add(new SimpleGlobalTask(LogicalSide.SERVER, Phase.END, $ -> {
                     ((AbstractArrowEntity) entity).inBlockState = null;

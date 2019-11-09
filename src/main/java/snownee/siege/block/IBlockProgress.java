@@ -1,13 +1,12 @@
-package snownee.siege;
+package snownee.siege.block;
 
 import java.util.Map;
 
 import com.google.common.base.Optional;
 
 import net.minecraft.util.math.BlockPos;
-import snownee.siege.block.BlockInfo;
 
-public interface ISiegeData {
+public interface IBlockProgress {
 
     Optional<BlockInfo> getInfo(BlockPos pos);
 

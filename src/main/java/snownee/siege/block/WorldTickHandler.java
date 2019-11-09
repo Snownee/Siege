@@ -22,8 +22,7 @@ public class WorldTickHandler {
     static {
         try {
             METHOD = ObfuscationReflectionHelper.findMethod(ChunkManager.class, "func_223491_f");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -39,8 +38,7 @@ public class WorldTickHandler {
         Iterable<ChunkHolder> holders;
         try {
             holders = (Iterable<ChunkHolder>) METHOD.invoke(world.getChunkProvider().chunkManager);
-        }
-        catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             return;
         }
         holders.forEach(holder -> {
@@ -48,7 +46,7 @@ public class WorldTickHandler {
             if (chunk == null || !world.getChunkProvider().isChunkLoaded(chunk.getPos())) {
                 return;
             }
-            chunk.getCapability(SiegeCapabilities.BREAKING_PROGRESS).ifPresent(progress -> {
+            chunk.getCapability(SiegeCapabilities.BLOCK_PROGRESS).ifPresent(progress -> {
                 Iterator<Entry<BlockPos, BlockInfo>> itr = progress.getAllData().entrySet().iterator();
                 while (itr.hasNext()) {
                     Entry<BlockPos, BlockInfo> e = itr.next();

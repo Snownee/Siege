@@ -1,4 +1,4 @@
-package snownee.siege;
+package snownee.siege.block;
 
 import java.util.Map;
 
@@ -11,14 +11,13 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.INBTSerializable;
-import snownee.siege.block.BlockInfo;
 
-public class SiegeData implements ISiegeData, INBTSerializable<CompoundNBT> {
+public class BlockProgress implements IBlockProgress, INBTSerializable<CompoundNBT> {
 
     public final Map<BlockPos, BlockInfo> progressData = Maps.newLinkedHashMap();
     private final Chunk chunk;
 
-    public SiegeData(Chunk chunk) {
+    public BlockProgress(Chunk chunk) {
         this.chunk = chunk;
     }
 
@@ -50,8 +49,7 @@ public class SiegeData implements ISiegeData, INBTSerializable<CompoundNBT> {
         BlockInfo info = null;
         if (f > 0) {
             info = getOrCreateInfo(pos);
-        }
-        else {
+        } else {
             info = getInfo(pos).orNull();
         }
         if (info == null) {
@@ -65,15 +63,13 @@ public class SiegeData implements ISiegeData, INBTSerializable<CompoundNBT> {
         float progress = info.getProgress() + f * hardness;
         if (progress <= 0) {
             return true;
-        }
-        else if (progress < 1) {
+        } else if (progress < 1) {
             info.setProgress(progress);
             if (chunk.getWorld().isRemote) {
                 System.out.println(progress);
                 Minecraft.getInstance().world.sendBlockBreakProgress(info.breakerID, pos, info.getProgressInt());
             }
-        }
-        else {
+        } else {
             chunk.getWorld().destroyBlock(pos, true);
             emptyInfo(pos);
         }

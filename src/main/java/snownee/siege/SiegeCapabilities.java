@@ -7,25 +7,27 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import snownee.siege.block.EmptyBlockProgress;
+import snownee.siege.block.IBlockProgress;
 
 public class SiegeCapabilities {
     public static final ResourceLocation PROGRESS_ID = new ResourceLocation(Siege.MODID, "progress");
 
-    @CapabilityInject(ISiegeData.class)
-    public static Capability<ISiegeData> BREAKING_PROGRESS = null;
+    @CapabilityInject(IBlockProgress.class)
+    public static Capability<IBlockProgress> BLOCK_PROGRESS = null;
 
     public static void init() {
-        CapabilityManager.INSTANCE.register(ISiegeData.class, new Capability.IStorage<ISiegeData>() {
+        CapabilityManager.INSTANCE.register(IBlockProgress.class, new Capability.IStorage<IBlockProgress>() {
 
             @Override
-            public INBT writeNBT(Capability<ISiegeData> capability, ISiegeData instance, Direction side) {
+            public INBT writeNBT(Capability<IBlockProgress> capability, IBlockProgress instance, Direction side) {
                 return new CompoundNBT();
             }
 
             @Override
-            public void readNBT(Capability<ISiegeData> capability, ISiegeData instance, Direction side, INBT nbt) {
+            public void readNBT(Capability<IBlockProgress> capability, IBlockProgress instance, Direction side, INBT nbt) {
                 // TODO Auto-generated method stub
             }
-        }, () -> EmptySiegeData.INSTANCE);
+        }, () -> EmptyBlockProgress.INSTANCE);
     }
 }
