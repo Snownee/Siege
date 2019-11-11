@@ -1,5 +1,6 @@
 package snownee.siege.block;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Optional;
@@ -35,14 +36,20 @@ public class BlockModule extends AbstractModule {
         SiegeCapabilities.init();
     }
 
-    @Nullable
-    public static Optional<BlockInfo> getBlockInfo(World world, BlockPos pos) {
+    @Nonnull
+    public static IBlockProgress getBlockProgress(World world, BlockPos pos) {
         Chunk chunk = world.getChunkAt(pos);
-        IBlockProgress data = chunk.getCapability(SiegeCapabilities.BLOCK_PROGRESS).orElse(null);
-        if (data != null) {
-            //return progress.progressData.get(pos);
-        }
-        return null;
+        return chunk.getCapability(SiegeCapabilities.BLOCK_PROGRESS).orElse(EmptyBlockProgress.INSTANCE);
+    }
+
+    @Nullable
+    public static Optional<BlockInfo> getInfo(World world, BlockPos pos) {
+        return getBlockProgress(world, pos).getInfo(pos);
+    }
+
+    @Nonnull
+    public static BlockInfo getOrCreateInfo(World world, BlockPos pos) {
+        return getBlockProgress(world, pos).getOrCreateInfo(pos);
     }
 
     @SubscribeEvent

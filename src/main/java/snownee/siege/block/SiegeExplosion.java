@@ -1,10 +1,12 @@
 package snownee.siege.block;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import net.minecraft.block.BlockState;
@@ -21,6 +23,8 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 
 public class SiegeExplosion extends Explosion {
+
+    private final Map<BlockPos, Float> breakingMap = Maps.newHashMap();
 
     public SiegeExplosion(World worldIn, @Nullable Entity exploderIn, double xIn, double yIn, double zIn, float sizeIn, boolean causesFireIn, Explosion.Mode modeIn) {
         super(worldIn, exploderIn, xIn, yIn, zIn, sizeIn, causesFireIn, modeIn);
@@ -57,6 +61,14 @@ public class SiegeExplosion extends Explosion {
                                 }
 
                                 f -= (f2 + 0.3F) * 0.3F;
+
+                                // Siege patch
+                                if (mode != Explosion.Mode.NONE && blockstate.isSolid() && f < 0) {
+                                    float progress = breakingMap.getOrDefault(blockpos, 0f);
+                                    progress = Math.max(progress, -f);
+                                    breakingMap.put(blockpos, progress);
+                                    System.out.println(progress);
+                                }
                             }
 
                             if (f > 0.0F && (this.exploder == null || this.exploder.canExplosionDestroyBlock(this, this.world, blockpos, blockstate, f))) {
@@ -117,5 +129,13 @@ public class SiegeExplosion extends Explosion {
             }
         }
 
+    }
+
+    @Override
+    public void doExplosionB(boolean spawnParticles) {
+        super.doExplosionB(spawnParticles);
+        breakingMap.forEach((pos, f) -> {
+            BlockModule.getBlockProgress(world, pos).destroy(pos, f);
+        });
     }
 }
