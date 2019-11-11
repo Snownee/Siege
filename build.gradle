@@ -93,6 +93,7 @@ dependencies {
     compile fg.deobf("mezz.jei:jei-${minecraft_version}:${jei_version}")
     
 	compile files("Kiwi-${minecraft_version}-${kiwi_version}-deobf.jar")
+	compile files("Fermion-1.0.0.jar")
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
