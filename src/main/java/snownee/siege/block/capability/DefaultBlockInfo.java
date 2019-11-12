@@ -1,11 +1,13 @@
-package snownee.siege.block;
+package snownee.siege.block.capability;
 
 import net.minecraft.block.Blocks;
+import snownee.siege.block.impl.BlockInfo;
 
-public class EmptyBlockInfo extends BlockInfo {
-    public static final EmptyBlockInfo INSTANCE = new EmptyBlockInfo();
+public class DefaultBlockInfo extends BlockInfo {
 
-    private EmptyBlockInfo() {
+    public static final DefaultBlockInfo INSTANCE = new DefaultBlockInfo();
+
+    private DefaultBlockInfo() {
         blockstate = Blocks.AIR.getDefaultState();
     }
 

@@ -1,4 +1,4 @@
-package snownee.siege.block;
+package snownee.siege.block.impl;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

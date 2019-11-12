@@ -21,6 +21,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+import snownee.siege.block.BlockModule;
 
 public class SiegeExplosion extends Explosion {
 
