@@ -27,8 +27,9 @@ import snownee.kiwi.schedule.Scheduler;
 import snownee.kiwi.schedule.impl.SimpleGlobalTask;
 import snownee.siege.SiegeCapabilities;
 
-@KiwiModule
+@KiwiModule(name = "block")
 @KiwiModule.Subscriber
+@KiwiModule.Optional
 public class BlockModule extends AbstractModule {
 
     @Override
