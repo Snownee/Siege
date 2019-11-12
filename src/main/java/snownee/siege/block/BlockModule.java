@@ -1,5 +1,10 @@
 package snownee.siege.block;
 
+import java.util.Optional;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
@@ -19,6 +24,7 @@ import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import snownee.kiwi.AbstractModule;
 import snownee.kiwi.KiwiModule;
+import snownee.kiwi.network.NetworkChannel;
 import snownee.kiwi.schedule.Scheduler;
 import snownee.kiwi.schedule.impl.SimpleGlobalTask;
 import snownee.siege.SiegeCapabilities;
@@ -27,12 +33,7 @@ import snownee.siege.block.capability.DefaultBlockProgress;
 import snownee.siege.block.capability.IBlockProgress;
 import snownee.siege.block.impl.BlockInfo;
 import snownee.siege.block.impl.BlockRecoverHandler;
-import snownee.siege.block.network.BreakProgressMessage;
-import snownee.siege.block.network.NetworkHandler;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Optional;
+import snownee.siege.block.network.BreakProgressPacket;
 
 @SuppressWarnings("unused")
 @KiwiModule(name = "block")
@@ -43,7 +44,7 @@ public class BlockModule extends AbstractModule {
     @Override
     protected void init(FMLCommonSetupEvent event) {
         DefaultBlockProgress.register();
-        NetworkHandler.INSTANCE.register();
+        NetworkChannel.register(BreakProgressPacket.class, new BreakProgressPacket.Handler());
     }
 
     @Nonnull
@@ -71,7 +72,7 @@ public class BlockModule extends AbstractModule {
     public void onProjectileImpact(ProjectileImpactEvent event) {
         Entity entity = event.getEntity();
         World world = entity.world;
-        if(world.isRemote) {
+        if (world.isRemote) {
             return;
         }
         if (event.getRayTraceResult().getType() != RayTraceResult.Type.BLOCK) {

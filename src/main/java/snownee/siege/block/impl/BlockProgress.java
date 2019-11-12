@@ -1,6 +1,10 @@
 package snownee.siege.block.impl;
 
+import java.util.Map;
+import java.util.Optional;
+
 import com.google.common.collect.Maps;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
@@ -8,11 +12,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.INBTSerializable;
 import snownee.siege.block.capability.IBlockProgress;
-import snownee.siege.block.network.BreakProgressMessage;
-import snownee.siege.block.network.NetworkHandler;
-
-import java.util.Map;
-import java.util.Optional;
+import snownee.siege.block.network.BreakProgressPacket;
 
 public class BlockProgress implements IBlockProgress, INBTSerializable<CompoundNBT> {
 
@@ -60,14 +60,14 @@ public class BlockProgress implements IBlockProgress, INBTSerializable<CompoundN
         float hardness = state.getBlockHardness(world, pos);
         float progress = info.getProgress() + f * hardness;
         if (progress <= 0) {
-            NetworkHandler.INSTANCE.sendToNear(new BreakProgressMessage(info.breakerID, pos, -1), pos, 64, chunk.getWorld().getDimension().getType());
+            new BreakProgressPacket(info.breakerID, pos, -1).send(world);
             return true;
         } else if (progress < 1) {
             info.setProgress(progress);
-            NetworkHandler.INSTANCE.sendToNear(new BreakProgressMessage(info.breakerID, pos, info.getProgressInt()), pos, 64, chunk.getWorld().getDimension().getType());
+            new BreakProgressPacket(info.breakerID, pos, info.getProgressInt()).send(world);
         } else {
             world.destroyBlock(pos, true);
-            NetworkHandler.INSTANCE.sendToNear(new BreakProgressMessage(info.breakerID, pos, -1), pos, 64, chunk.getWorld().getDimension().getType());
+            new BreakProgressPacket(info.breakerID, pos, -1).send(world);
             emptyInfo(pos);
         }
         return false;
