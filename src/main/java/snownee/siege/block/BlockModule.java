@@ -15,6 +15,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
@@ -33,7 +34,7 @@ import snownee.siege.block.capability.DefaultBlockProgress;
 import snownee.siege.block.capability.IBlockProgress;
 import snownee.siege.block.impl.BlockInfo;
 import snownee.siege.block.impl.BlockRecoverHandler;
-import snownee.siege.block.network.BreakProgressPacket;
+import snownee.siege.block.network.SyncBlockInfoPacket;
 
 @SuppressWarnings("unused")
 @KiwiModule(name = "block")
@@ -44,7 +45,8 @@ public class BlockModule extends AbstractModule {
     @Override
     protected void init(FMLCommonSetupEvent event) {
         DefaultBlockProgress.register();
-        NetworkChannel.register(BreakProgressPacket.class, new BreakProgressPacket.Handler());
+        NetworkChannel.register(SyncBlockInfoPacket.class, new SyncBlockInfoPacket.Handler());
+        MinecraftForge.EVENT_BUS.register(BlockRecoverHandler.class);
     }
 
     @Nonnull
@@ -96,10 +98,4 @@ public class BlockModule extends AbstractModule {
         });
     }
 
-    @SubscribeEvent
-    public void tick(TickEvent.WorldTickEvent event) {
-        if (!event.world.isRemote && event.phase == Phase.END && event.world.getWorldInfo().getGameTime() % 20 == 1) {
-            BlockRecoverHandler.recoverAllBlocks((ServerWorld) event.world);
-        }
-    }
 }

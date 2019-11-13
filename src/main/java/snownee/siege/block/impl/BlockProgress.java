@@ -12,7 +12,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.INBTSerializable;
 import snownee.siege.block.capability.IBlockProgress;
-import snownee.siege.block.network.BreakProgressPacket;
+import snownee.siege.block.network.SyncBlockInfoPacket;
 
 public class BlockProgress implements IBlockProgress, INBTSerializable<CompoundNBT> {
 
@@ -44,7 +44,7 @@ public class BlockProgress implements IBlockProgress, INBTSerializable<CompoundN
     }
 
     @Override
-    public boolean destroy(BlockPos pos, float f) {
+    public boolean destroy(BlockPos pos, float f, boolean sync) {
         if (f == 0) {
             return false;
         }
@@ -60,22 +60,25 @@ public class BlockProgress implements IBlockProgress, INBTSerializable<CompoundN
         float hardness = state.getBlockHardness(world, pos);
         float progress = info.getProgress() + f * hardness;
         if (progress <= 0) {
-            new BreakProgressPacket(info.breakerID, pos, -1).send(world);
+            if (sync)
+                new SyncBlockInfoPacket(pos, info.lastMine, -1).send(world);
             return true;
         } else if (progress < 1) {
             info.setProgress(progress);
-            new BreakProgressPacket(info.breakerID, pos, info.getProgressInt()).send(world);
+            if (sync)
+                new SyncBlockInfoPacket(pos, info.lastMine, info.getProgress()).send(world);
         } else {
             world.destroyBlock(pos, true);
-            new BreakProgressPacket(info.breakerID, pos, -1).send(world);
+            if (sync)
+                new SyncBlockInfoPacket(pos, info.lastMine, -1).send(world);
             emptyInfo(pos);
         }
         return false;
     }
 
     @Override
-    public boolean recover(BlockPos pos, float f) {
-        return destroy(pos, -f);
+    public boolean recover(BlockPos pos, float f, boolean sync) {
+        return destroy(pos, -f, sync);
     }
 
     @Override

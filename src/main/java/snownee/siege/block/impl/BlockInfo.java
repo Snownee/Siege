@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.fml.common.thread.EffectiveSide;
 
 public class BlockInfo {
     // In order not to conflict with Create, start from a negative number
@@ -17,7 +18,7 @@ public class BlockInfo {
     public final int breakerID;
 
     public BlockInfo() {
-        breakerID = NEXT_ID.decrementAndGet();
+        breakerID = EffectiveSide.get().isServer() ? 0 : NEXT_ID.decrementAndGet();
     }
 
     public BlockState getBlockState(Chunk chunk, BlockPos pos) {

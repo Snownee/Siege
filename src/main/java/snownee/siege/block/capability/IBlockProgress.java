@@ -1,10 +1,10 @@
 package snownee.siege.block.capability;
 
-import net.minecraft.util.math.BlockPos;
-import snownee.siege.block.impl.BlockInfo;
-
 import java.util.Map;
 import java.util.Optional;
+
+import net.minecraft.util.math.BlockPos;
+import snownee.siege.block.impl.BlockInfo;
 
 public interface IBlockProgress {
 
@@ -14,9 +14,17 @@ public interface IBlockProgress {
 
     void emptyInfo(BlockPos pos);
 
-    boolean recover(BlockPos pos, float f);
+    default boolean recover(BlockPos pos, float f) {
+        return recover(pos, f, true);
+    }
 
-    boolean destroy(BlockPos pos, float f);
+    boolean recover(BlockPos pos, float f, boolean sync);
+
+    default boolean destroy(BlockPos pos, float f) {
+        return destroy(pos, f, true);
+    }
+
+    boolean destroy(BlockPos pos, float f, boolean sync);
 
     Map<BlockPos, BlockInfo> getAllData();
 

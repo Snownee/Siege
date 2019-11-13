@@ -1,14 +1,14 @@
 package snownee.siege.block.capability;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import snownee.siege.Siege;
 import snownee.siege.block.impl.BlockInfo;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 public class DefaultBlockProgress implements IBlockProgress {
 
@@ -23,7 +23,7 @@ public class DefaultBlockProgress implements IBlockProgress {
     private DefaultBlockProgress() {}
 
     @Override
-    public boolean destroy(BlockPos pos, float f) {
+    public boolean destroy(BlockPos pos, float f, boolean sync) {
         return false;
     }
 
@@ -38,7 +38,7 @@ public class DefaultBlockProgress implements IBlockProgress {
     }
 
     @Override
-    public boolean recover(BlockPos pos, float f) {
+    public boolean recover(BlockPos pos, float f, boolean sync) {
         return false;
     }
 

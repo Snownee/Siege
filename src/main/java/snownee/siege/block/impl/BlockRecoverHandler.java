@@ -1,48 +1,77 @@
 package snownee.siege.block.impl;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 
-import net.minecraft.world.WorldType;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.server.ChunkHolder;
-import net.minecraft.world.server.ChunkManager;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.TickEvent.Phase;
+import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.thread.EffectiveSide;
 import snownee.siege.SiegeCapabilities;
 
 public class BlockRecoverHandler {
 
-    private static Method METHOD;
+    private static final Multimap<IWorld, Chunk> chunks = LinkedHashMultimap.create();
+    private static int tickClient = 0;
+    private static int tickServer = 0;
 
-    static {
-        try {
-            METHOD = ObfuscationReflectionHelper.findMethod(ChunkManager.class, "func_223491_f");
-        } catch (Exception e) {
-            e.printStackTrace();
+    @SubscribeEvent
+    public static void loadChunk(ChunkEvent.Load event) {
+        if (event.getChunk() instanceof Chunk) {
+            chunks.put(event.getWorld(), ((Chunk) event.getChunk()));
+            System.out.println(chunks.size());
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public static void recoverAllBlocks(ServerWorld world) {
-        if (METHOD == null) {
-            return;
+    @SubscribeEvent
+    public static void unloadChunk(ChunkEvent.Unload event) {
+        if (event.getChunk() instanceof Chunk) {
+            chunks.remove(event.getWorld(), (Chunk) event.getChunk());
+            System.out.println(chunks.size());
         }
-        if (world.getWorldInfo().getGenerator() == WorldType.DEBUG_ALL_BLOCK_STATES) {
-            return;
+    }
+
+    @SubscribeEvent
+    public static void unloadWorld(WorldEvent.Unload event) {
+        if (event.getWorld().isRemote()) {
+            chunks.clear();
+        } else {
+            chunks.removeAll(event.getWorld());
         }
-        Iterable<ChunkHolder> holders;
-        try {
-            holders = (Iterable<ChunkHolder>) METHOD.invoke(world.getChunkProvider().chunkManager);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            return;
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @SubscribeEvent
+    public static void tickClient(TickEvent.ClientTickEvent event) {
+        if (event.phase == Phase.END && Minecraft.getInstance().player != null && ++tickClient % 20 == 1) {
+            recoverAllBlocks();
         }
-        holders.forEach(holder -> {
-            Chunk chunk = holder.func_219298_c();
-            if (chunk == null || !world.getChunkProvider().isChunkLoaded(chunk.getPos())) {
-                return;
+    }
+
+    @SubscribeEvent
+    public static void tickServer(TickEvent.ServerTickEvent event) {
+        if (event.phase == Phase.END && ++tickServer % 20 == 1) {
+            recoverAllBlocks();
+        }
+    }
+
+    public static void recoverAllBlocks() {
+        chunks.values().stream().filter(c -> !c.isEmpty()).forEach(c -> c.getCapability(SiegeCapabilities.BLOCK_PROGRESS).ifPresent(progress -> progress.getAllData().entrySet().removeIf(e -> {
+            if (progress.recover(e.getKey(), .05f, false)) {
+                if (EffectiveSide.get().isClient()) {
+                    Minecraft.getInstance().world.sendBlockBreakProgress(e.getValue().breakerID, e.getKey(), e.getValue().getProgressInt());
+                }
+                return true;
+            } else {
+                return false;
             }
-            chunk.getCapability(SiegeCapabilities.BLOCK_PROGRESS).ifPresent(progress -> progress.getAllData().entrySet().removeIf(e -> progress.recover(e.getKey(), .05f)));
-        });
+        })));
     }
 }
