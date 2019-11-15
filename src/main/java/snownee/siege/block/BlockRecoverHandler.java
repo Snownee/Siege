@@ -1,4 +1,4 @@
-package snownee.siege.block.impl;
+package snownee.siege.block;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
@@ -13,7 +13,6 @@ import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.thread.EffectiveSide;
 import snownee.siege.SiegeCapabilities;
 
 public class BlockRecoverHandler {
@@ -50,7 +49,7 @@ public class BlockRecoverHandler {
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public static void tickClient(TickEvent.ClientTickEvent event) {
-        if (event.phase == Phase.END && Minecraft.getInstance().player != null && ++tickClient % 20 == 1) {
+        if (event.phase == Phase.END && Minecraft.getInstance().player != null && !Minecraft.getInstance().isGamePaused() && ++tickClient % 20 == 1) {
             recoverAllBlocks();
         }
     }
@@ -64,14 +63,11 @@ public class BlockRecoverHandler {
 
     public static void recoverAllBlocks() {
         chunks.values().stream().filter(c -> !c.isEmpty()).forEach(c -> c.getCapability(SiegeCapabilities.BLOCK_PROGRESS).ifPresent(progress -> progress.getAllData().entrySet().removeIf(e -> {
-            if (progress.recover(e.getKey(), .05f, false)) {
-                if (EffectiveSide.get().isClient()) {
-                    Minecraft.getInstance().world.sendBlockBreakProgress(e.getValue().breakerID, e.getKey(), e.getValue().getProgressInt());
-                }
-                return true;
-            } else {
-                return false;
+            boolean end = progress.recover(e.getKey(), .05f, false);
+            if (c.getWorld().isRemote && e.getValue().breakerID < 0) {
+                Minecraft.getInstance().world.sendBlockBreakProgress(e.getValue().breakerID, e.getKey(), e.getValue().getProgressInt());
             }
+            return end;
         })));
     }
 }

@@ -8,6 +8,7 @@ import com.google.common.collect.Maps;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -59,12 +60,13 @@ public class BlockProgress implements IBlockProgress, INBTSerializable<CompoundN
         }
         float hardness = state.getBlockHardness(world, pos);
         float progress = info.getProgress() + f * hardness;
-        if (progress <= 0) {
+        info.setProgress(progress);
+        progress = info.getProgress();
+        if (progress == 0) {
             if (sync)
                 new SyncBlockInfoPacket(pos, info.lastMine, -1).send(world);
             return true;
         } else if (progress < 1) {
-            info.setProgress(progress);
             if (sync)
                 new SyncBlockInfoPacket(pos, info.lastMine, info.getProgress()).send(world);
         } else {

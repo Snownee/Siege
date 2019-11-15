@@ -14,12 +14,14 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -33,7 +35,6 @@ import snownee.siege.block.capability.BlockProgressProvider;
 import snownee.siege.block.capability.DefaultBlockProgress;
 import snownee.siege.block.capability.IBlockProgress;
 import snownee.siege.block.impl.BlockInfo;
-import snownee.siege.block.impl.BlockRecoverHandler;
 import snownee.siege.block.network.SyncBlockInfoPacket;
 
 @SuppressWarnings("unused")
@@ -98,4 +99,16 @@ public class BlockModule extends AbstractModule {
         });
     }
 
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public void breakBlock(BlockEvent.BreakEvent event) {
+        getBlockProgress(event.getWorld().getWorld(), event.getPos()).emptyInfo(event.getPos());
+    }
+
+    @SubscribeEvent
+    public void clickBlock(PlayerInteractEvent.LeftClickBlock event) {}
+
+    @SubscribeEvent
+    public void damageBlock(PlayerEvent.BreakSpeed event) {
+        //System.out.println(event.getOriginalSpeed());
+    }
 }

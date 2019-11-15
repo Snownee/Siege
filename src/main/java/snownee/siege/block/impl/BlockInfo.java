@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.common.thread.EffectiveSide;
 
@@ -33,10 +34,10 @@ public class BlockInfo {
     }
 
     public void setProgress(float progress) {
-        this.progress = progress;
+        this.progress = MathHelper.clamp(progress, 0, 1);
     }
 
     public int getProgressInt() {
-        return (int) (progress * 10);
+        return MathHelper.floor(progress * 10) - 1;
     }
 }
