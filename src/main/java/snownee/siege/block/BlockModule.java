@@ -29,6 +29,7 @@ import snownee.kiwi.network.NetworkChannel;
 import snownee.kiwi.schedule.Scheduler;
 import snownee.kiwi.schedule.impl.SimpleGlobalTask;
 import snownee.siege.SiegeCapabilities;
+import snownee.siege.SiegeConfig;
 import snownee.siege.block.capability.BlockProgressProvider;
 import snownee.siege.block.capability.DefaultBlockProgress;
 import snownee.siege.block.capability.IBlockProgress;
@@ -71,6 +72,9 @@ public class BlockModule extends AbstractModule {
 
     @SubscribeEvent
     public void onProjectileImpact(ProjectileImpactEvent event) {
+        if (!SiegeConfig.projectileDamage) {
+            return;
+        }
         Entity entity = event.getEntity();
         World world = entity.world;
         if (world.isRemote) {
@@ -87,7 +91,7 @@ public class BlockModule extends AbstractModule {
         Chunk chunk = world.getChunkAt(entity.getPosition());
         chunk.getCapability(SiegeCapabilities.BLOCK_PROGRESS).ifPresent(data -> {
             double vel = entity.getMotion().squareDistanceTo(Vec3d.ZERO);
-            data.destroy(trace.getPos(), (float) vel);
+            data.destroy(trace.getPos(), (float) vel * SiegeConfig.projectileDamageFactors.getOrDefault(entity.getType().getRegistryName(), 1));
             if (entity instanceof AbstractArrowEntity) {
                 Scheduler.add(new SimpleGlobalTask(LogicalSide.SERVER, Phase.END, s -> {
                     ((AbstractArrowEntity) entity).inBlockState = null;
