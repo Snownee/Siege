@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.util.math.BlockPos;
@@ -19,9 +20,6 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.world.BlockEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -83,7 +81,7 @@ public class BlockModule extends AbstractModule {
         }
         BlockRayTraceResult trace = (BlockRayTraceResult) event.getRayTraceResult();
         BlockState state = world.getBlockState(trace.getPos());
-        if (!state.isSolid()) {
+        if (!canDamage(state)) {
             return;
         }
         Chunk chunk = world.getChunkAt(entity.getPosition());
@@ -99,13 +97,26 @@ public class BlockModule extends AbstractModule {
         });
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void breakBlock(BlockEvent.BreakEvent event) {
-        getBlockProgress(event.getWorld().getWorld(), event.getPos()).emptyInfo(event.getPos());
+    public static void onBlockAdded(Chunk chunk, BlockPos pos, BlockState oldState, BlockState newState) {
+        if (!canDamage(oldState)) {
+            return;
+        }
+        if (oldState.getBlock() == newState.getBlock()) {
+            return;
+        }
+        chunk.getCapability(SiegeCapabilities.BLOCK_PROGRESS).ifPresent(data -> {
+            data.getInfo(pos).ifPresent(info -> {
+                if (chunk.getWorld().isRemote && info.breakerID < 0) {
+                    Minecraft.getInstance().world.sendBlockBreakProgress(info.breakerID, pos, -1);
+                }
+                data.emptyInfo(pos);
+            });
+        });
     }
 
-    @SubscribeEvent
-    public void clickBlock(PlayerInteractEvent.LeftClickBlock event) {}
+    public static boolean canDamage(BlockState state) {
+        return state.isSolid() && state.getBlock().blockHardness > 0;
+    }
 
     @SubscribeEvent
     public void damageBlock(PlayerEvent.BreakSpeed event) {
