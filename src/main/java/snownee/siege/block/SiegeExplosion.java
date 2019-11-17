@@ -61,15 +61,14 @@ public class SiegeExplosion extends Explosion {
                                     f2 = this.exploder.getExplosionResistance(this, this.world, blockpos, blockstate, ifluidstate, f2);
                                 }
 
-                                f -= (f2 + 0.3F) * 0.3F;
-
                                 // Siege patch
-                                if (BlockModule.INSTANCE != null && SiegeConfig.explosionDamage && mode != Explosion.Mode.NONE && blockstate.isSolid() && f < 0) {
-                                    float progress = breakingMap.getOrDefault(blockpos, 0f);
-                                    progress = Math.max(progress, f * -3);
-                                    breakingMap.put(blockpos, progress);
-                                    System.out.println(progress);
+                                if (BlockModule.INSTANCE != null && SiegeConfig.explosionDamage && mode != Explosion.Mode.NONE && BlockModule.canDamage(blockstate) && f < (f2 + 0.3F) * 0.3F) {
+                                    float damage = breakingMap.getOrDefault(blockpos, 0f);
+                                    damage = Math.max(damage, f);
+                                    breakingMap.put(blockpos, damage);
                                 }
+
+                                f -= (f2 + 0.3F) * 0.3F;
                             }
 
                             if (f > 0.0F && (this.exploder == null || this.exploder.canExplosionDestroyBlock(this, this.world, blockpos, blockstate, f))) {
@@ -136,7 +135,7 @@ public class SiegeExplosion extends Explosion {
     public void doExplosionB(boolean spawnParticles) {
         super.doExplosionB(spawnParticles);
         breakingMap.forEach((pos, f) -> {
-            BlockModule.getBlockProgress(world, pos).destroy(pos, f);
+            BlockModule.getBlockProgress(world, pos).destroy(pos, f * SiegeConfig.explosionDamageFactor);
         });
     }
 }

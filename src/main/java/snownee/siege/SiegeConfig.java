@@ -13,6 +13,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
@@ -26,12 +27,14 @@ public final class SiegeConfig {
     private static BooleanValue blockRecoveryVal;
 
     private static BooleanValue explosionDamageVal;
+    private static DoubleValue explosionDamageFactorVal;
 
     private static BooleanValue projectileDamageVal;
     private static ConfigValue<List<? extends String>> projectileDamageFactorsVal;
 
     public static boolean blockRecovery;
     public static boolean explosionDamage;
+    public static float explosionDamageFactor;
     public static boolean projectileDamage;
     public static final Object2FloatMap<ResourceLocation> projectileDamageFactors = new Object2FloatArrayMap<>();
 
@@ -44,6 +47,7 @@ public final class SiegeConfig {
         builder.push("block");
         blockRecoveryVal = builder.define("blockRecovery", true);
         explosionDamageVal = builder.define("explosionDamage", true);
+        explosionDamageFactorVal = builder.defineInRange("explosionDamageFactor", 3f, 0, 100);
         projectileDamageVal = builder.define("projectileDamage", true);
         projectileDamageFactorsVal = builder.defineList("projectileDamageFactors", () -> Arrays.asList("arrow=1", "snowball=0.1"), $ -> {
             if ($ == null || $.getClass() != String.class) {
@@ -77,6 +81,7 @@ public final class SiegeConfig {
     public static void refresh() {
         blockRecovery = blockRecoveryVal.get();
         explosionDamage = explosionDamageVal.get();
+        explosionDamageFactor = explosionDamageFactorVal.get().floatValue();
         projectileDamage = projectileDamageVal.get();
         projectileDamageFactors.clear();
         projectileDamageFactorsVal.get().forEach(s -> {
