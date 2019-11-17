@@ -50,15 +50,17 @@ public class SyncBlockInfoPacket extends Packet {
 
         @Override
         public void handle(SyncBlockInfoPacket msg, Supplier<Context> ctx) {
-            World world = Minecraft.getInstance().world;
-            IBlockProgress data = BlockModule.getBlockProgress(world, msg.pos);
-            if (msg.progress <= 0) {
-                data.emptyInfo(msg.pos);
-            } else {
-                BlockInfo info = data.getOrCreateInfo(msg.pos);
-                info.setProgress(msg.progress);
-                world.sendBlockBreakProgress(info.breakerID, msg.pos, info.getProgressInt());
-            }
+            ctx.get().enqueueWork(() -> {
+                World world = Minecraft.getInstance().world;
+                IBlockProgress data = BlockModule.getBlockProgress(world, msg.pos);
+                if (msg.progress <= 0) {
+                    data.emptyInfo(msg.pos);
+                } else {
+                    BlockInfo info = data.getOrCreateInfo(msg.pos);
+                    info.setProgress(msg.progress);
+                    world.sendBlockBreakProgress(info.breakerID, msg.pos, info.getProgressInt());
+                }
+            });
             ctx.get().setPacketHandled(true);
         }
     }
