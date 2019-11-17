@@ -42,6 +42,8 @@ import snownee.siege.block.network.SyncBlockInfoPacket;
 @KiwiModule.Optional
 public class BlockModule extends AbstractModule {
 
+    public static BlockModule INSTANCE;
+
     @Override
     protected void init(FMLCommonSetupEvent event) {
         DefaultBlockProgress.register();
@@ -102,7 +104,7 @@ public class BlockModule extends AbstractModule {
     }
 
     public static void onBlockAdded(Chunk chunk, BlockPos pos, BlockState oldState, BlockState newState) {
-        if (!canDamage(oldState)) {
+        if (INSTANCE == null || !canDamage(oldState)) {
             return;
         }
         if (oldState.getBlock() == newState.getBlock()) {

@@ -14,6 +14,7 @@ import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import snownee.siege.SiegeCapabilities;
+import snownee.siege.SiegeConfig;
 
 public class BlockRecoverHandler {
 
@@ -49,14 +50,14 @@ public class BlockRecoverHandler {
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
     public static void tickClient(TickEvent.ClientTickEvent event) {
-        if (event.phase == Phase.END && Minecraft.getInstance().player != null && !Minecraft.getInstance().isGamePaused() && ++tickClient % 20 == 1) {
+        if (SiegeConfig.blockRecovery && event.phase == Phase.END && Minecraft.getInstance().player != null && !Minecraft.getInstance().isGamePaused() && ++tickClient % 20 == 1) {
             recoverAllBlocks();
         }
     }
 
     @SubscribeEvent
     public static void tickServer(TickEvent.ServerTickEvent event) {
-        if (event.phase == Phase.END && ++tickServer % 20 == 1) {
+        if (SiegeConfig.blockRecovery && event.phase == Phase.END && ++tickServer % 20 == 1) {
             recoverAllBlocks();
         }
     }

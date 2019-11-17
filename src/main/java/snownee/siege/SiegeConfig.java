@@ -23,9 +23,15 @@ public final class SiegeConfig {
 
     static final ForgeConfigSpec spec;
 
+    private static BooleanValue blockRecoveryVal;
+
+    private static BooleanValue explosionDamageVal;
+
     private static BooleanValue projectileDamageVal;
     private static ConfigValue<List<? extends String>> projectileDamageFactorsVal;
 
+    public static boolean blockRecovery;
+    public static boolean explosionDamage;
     public static boolean projectileDamage;
     public static final Object2FloatMap<ResourceLocation> projectileDamageFactors = new Object2FloatArrayMap<>();
 
@@ -36,6 +42,8 @@ public final class SiegeConfig {
 
     private SiegeConfig(ForgeConfigSpec.Builder builder) {
         builder.push("block");
+        blockRecoveryVal = builder.define("blockRecovery", true);
+        explosionDamageVal = builder.define("explosionDamage", true);
         projectileDamageVal = builder.define("projectileDamage", true);
         projectileDamageFactorsVal = builder.defineList("projectileDamageFactors", () -> Arrays.asList("arrow=1", "snowball=0.1"), $ -> {
             if ($ == null || $.getClass() != String.class) {
@@ -67,6 +75,8 @@ public final class SiegeConfig {
     }
 
     public static void refresh() {
+        blockRecovery = blockRecoveryVal.get();
+        explosionDamage = explosionDamageVal.get();
         projectileDamage = projectileDamageVal.get();
         projectileDamageFactors.clear();
         projectileDamageFactorsVal.get().forEach(s -> {

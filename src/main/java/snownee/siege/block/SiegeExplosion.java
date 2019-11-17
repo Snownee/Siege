@@ -21,6 +21,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+import snownee.siege.SiegeConfig;
 
 public class SiegeExplosion extends Explosion {
 
@@ -63,7 +64,7 @@ public class SiegeExplosion extends Explosion {
                                 f -= (f2 + 0.3F) * 0.3F;
 
                                 // Siege patch
-                                if (mode != Explosion.Mode.NONE && blockstate.isSolid() && f < 0) {
+                                if (BlockModule.INSTANCE != null && SiegeConfig.explosionDamage && mode != Explosion.Mode.NONE && blockstate.isSolid() && f < 0) {
                                     float progress = breakingMap.getOrDefault(blockpos, 0f);
                                     progress = Math.max(progress, f * -3);
                                     breakingMap.put(blockpos, progress);
