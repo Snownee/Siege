@@ -1,6 +1,8 @@
 package snownee.siege.block.impl;
 
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 import javax.annotation.Nonnull;
@@ -21,7 +23,7 @@ import snownee.siege.block.network.SyncBlockInfoPacket;
 
 public class BlockProgress implements IBlockProgress, INBTSerializable<CompoundNBT> {
 
-    private final Map<BlockPos, BlockInfo> progressData = Maps.newLinkedHashMap();
+    private final Map<BlockPos, BlockInfo> progressData = Maps.newConcurrentMap();
     private final Chunk chunk;
 
     public BlockProgress(Chunk chunk) {
@@ -46,6 +48,16 @@ public class BlockProgress implements IBlockProgress, INBTSerializable<CompoundN
     @Override
     @Nonnull
     public BlockInfo getOrCreateInfo(BlockPos pos) {
+        if (outOfLimit() && !progressData.containsKey(pos)) {
+            Iterator<Entry<BlockPos, BlockInfo>> itr = progressData.entrySet().iterator();
+            while (itr.hasNext() && outOfLimit()) {
+                Entry<BlockPos, BlockInfo> e = itr.next();
+                if (chunk.getWorld().isRemote && e.getValue().breakerID < 0) {
+                    BlockModule.sendBreakAnimation(e.getValue().breakerID, pos, -1);
+                }
+                itr.remove();
+            }
+        }
         return progressData.computeIfAbsent(pos, s -> outOfLimit() ? DefaultBlockInfo.INSTANCE : new BlockInfo());
     }
 

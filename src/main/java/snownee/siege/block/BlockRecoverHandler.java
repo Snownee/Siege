@@ -69,7 +69,7 @@ public class BlockRecoverHandler {
             }
             boolean end = progress.recover(e.getKey(), SiegeConfig.blockRecoverySpeed, false);
             if (c.getWorld().isRemote && e.getValue().breakerID < 0) {
-                Minecraft.getInstance().world.sendBlockBreakProgress(e.getValue().breakerID, e.getKey(), e.getValue().getProgressInt());
+                BlockModule.sendBreakAnimation(e.getValue().breakerID, e.getKey(), e.getValue().getProgressInt());
             }
             return end;
         })));

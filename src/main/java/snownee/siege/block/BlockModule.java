@@ -15,6 +15,8 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent.Phase;
@@ -113,11 +115,17 @@ public class BlockModule extends AbstractModule {
         chunk.getCapability(SiegeCapabilities.BLOCK_PROGRESS).ifPresent(data -> {
             data.getInfo(pos).ifPresent(info -> {
                 if (chunk.getWorld().isRemote && info.breakerID < 0) {
-                    Minecraft.getInstance().world.sendBlockBreakProgress(info.breakerID, pos, -1);
+                    sendBreakAnimation(info.breakerID, pos, -1);
                 }
                 data.emptyInfo(pos);
             });
         });
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static void sendBreakAnimation(int breakerID, BlockPos pos, int progress) {
+        Minecraft mc = Minecraft.getInstance();
+        mc.runAsync(() -> mc.world.sendBlockBreakProgress(breakerID, pos, progress));
     }
 
     public static boolean canDamage(BlockState state) {
