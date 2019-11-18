@@ -64,7 +64,7 @@ public class BlockRecoverHandler {
 
     public static void recoverAllBlocks() {
         chunks.values().stream().filter(c -> !c.isEmpty()).forEach(c -> c.getCapability(SiegeCapabilities.BLOCK_PROGRESS).ifPresent(progress -> progress.getAllData().entrySet().removeIf(e -> {
-            if (e.getValue().lastMine + 120 > c.getWorld().getGameTime()) {
+            if (c.getWorld().getGameTime() - e.getValue().lastMine > SiegeConfig.blockRecoveryDelay) {
                 return false;
             }
             boolean end = progress.recover(e.getKey(), SiegeConfig.blockRecoverySpeed, false);

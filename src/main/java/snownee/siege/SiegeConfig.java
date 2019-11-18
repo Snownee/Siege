@@ -28,6 +28,7 @@ public final class SiegeConfig {
     private static IntValue maxDamagedBlockPerChunkVal;
 
     private static DoubleValue blockRecoverySpeedVal;
+    public static IntValue blockRecoveryDelayVal;
 
     private static DoubleValue blockDropsRateVal;
 
@@ -39,6 +40,7 @@ public final class SiegeConfig {
 
     public static int maxDamagedBlockPerChunk;
     public static float blockRecoverySpeed;
+    public static int blockRecoveryDelay;
     public static float blockDropsRate;
     public static boolean explosionDamage;
     public static float explosionDamageFactor;
@@ -54,6 +56,7 @@ public final class SiegeConfig {
         builder.push("block");
         maxDamagedBlockPerChunkVal = builder.defineInRange("maxDamagedBlockPerChunk", 128, 0, 4096);
         blockRecoverySpeedVal = builder.defineInRange("blockRecoverySpeed", .05D, 0, 4096);
+        blockRecoveryDelayVal = builder.defineInRange("blockRecoveryDelay", 120, 0, 3600);
         blockDropsRateVal = builder.defineInRange("blockDropsRate", 1D, 0, 1);
         explosionDamageVal = builder.define("explosionDamage", true);
         explosionDamageFactorVal = builder.defineInRange("explosionDamageFactor", 3D, 0, 100);
@@ -90,6 +93,7 @@ public final class SiegeConfig {
     public static void refresh() {
         maxDamagedBlockPerChunk = maxDamagedBlockPerChunkVal.get();
         blockRecoverySpeed = blockRecoverySpeedVal.get().floatValue();
+        blockRecoveryDelay = blockRecoveryDelayVal.get();
         blockDropsRate = blockDropsRateVal.get().floatValue();
         explosionDamage = explosionDamageVal.get();
         explosionDamageFactor = explosionDamageFactorVal.get().floatValue();
