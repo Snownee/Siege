@@ -18,10 +18,10 @@ import snownee.siege.block.impl.BlockInfo;
 public class SyncBlockInfoPacket extends Packet {
 
     private BlockPos pos;
-    private int lastMine;
+    private long lastMine;
     private float progress;
 
-    public SyncBlockInfoPacket(BlockPos pos, int lastMine, float progress) {
+    public SyncBlockInfoPacket(BlockPos pos, long lastMine, float progress) {
         this.pos = pos;
         this.lastMine = lastMine;
         this.progress = progress;
@@ -38,13 +38,13 @@ public class SyncBlockInfoPacket extends Packet {
     public static class Handler extends PacketHandler<SyncBlockInfoPacket> {
         @Override
         public SyncBlockInfoPacket decode(PacketBuffer buffer) {
-            return new SyncBlockInfoPacket(buffer.readBlockPos(), buffer.readInt(), buffer.readFloat());
+            return new SyncBlockInfoPacket(buffer.readBlockPos(), buffer.readLong(), buffer.readFloat());
         }
 
         @Override
         public void encode(SyncBlockInfoPacket msg, PacketBuffer buffer) {
             buffer.writeBlockPos(msg.pos);
-            buffer.writeInt(msg.lastMine);
+            buffer.writeLong(msg.lastMine);
             buffer.writeFloat(msg.progress);
         }
 
@@ -57,7 +57,7 @@ public class SyncBlockInfoPacket extends Packet {
                     data.emptyInfo(msg.pos);
                 } else {
                     BlockInfo info = data.getOrCreateInfo(msg.pos);
-                    info.setProgress(msg.progress);
+                    info.setProgress(msg.progress, msg.lastMine);
                     world.sendBlockBreakProgress(info.breakerID, msg.pos, info.getProgressInt());
                 }
             });

@@ -64,6 +64,9 @@ public class BlockRecoverHandler {
 
     public static void recoverAllBlocks() {
         chunks.values().stream().filter(c -> !c.isEmpty()).forEach(c -> c.getCapability(SiegeCapabilities.BLOCK_PROGRESS).ifPresent(progress -> progress.getAllData().entrySet().removeIf(e -> {
+            if (e.getValue().lastMine + 120 > c.getWorld().getGameTime()) {
+                return false;
+            }
             boolean end = progress.recover(e.getKey(), SiegeConfig.blockRecoverySpeed, false);
             if (c.getWorld().isRemote && e.getValue().breakerID < 0) {
                 Minecraft.getInstance().world.sendBlockBreakProgress(e.getValue().breakerID, e.getKey(), e.getValue().getProgressInt());

@@ -64,8 +64,8 @@ public class BlockProgress implements IBlockProgress, INBTSerializable<CompoundN
             return false;
         }
         float hardness = state.getBlockHardness(world, pos);
-        float progress = info.getProgress() + f * hardness;
-        info.setProgress(progress);
+        float progress = info.getProgress() + f / hardness;
+        info.setProgress(progress, world);
         progress = info.getProgress();
         if (progress == 0) {
             if (sync)

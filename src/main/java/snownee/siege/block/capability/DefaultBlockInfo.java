@@ -22,5 +22,5 @@ public class DefaultBlockInfo extends BlockInfo {
     }
 
     @Override
-    public void setProgress(float progress) {}
+    public void setProgress(float progress, long time) {}
 }

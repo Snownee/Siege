@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.common.thread.EffectiveSide;
 
@@ -15,7 +16,7 @@ public class BlockInfo {
 
     protected BlockState blockstate;
     private float progress;
-    public int lastMine;
+    public long lastMine;
     public final int breakerID;
 
     public BlockInfo() {
@@ -33,8 +34,13 @@ public class BlockInfo {
         return progress;
     }
 
-    public void setProgress(float progress) {
+    public void setProgress(float progress, World world) {
+        setProgress(progress, world.getGameTime());
+    }
+
+    public void setProgress(float progress, long time) {
         this.progress = MathHelper.clamp(progress, 0, 1);
+        this.lastMine = time;
     }
 
     public int getProgressInt() {
