@@ -14,6 +14,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
+import net.minecraftforge.common.ForgeConfigSpec.IntValue;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
@@ -24,7 +25,11 @@ public final class SiegeConfig {
 
     static final ForgeConfigSpec spec;
 
-    private static BooleanValue blockRecoveryVal;
+    private static IntValue maxDamagedBlockPerChunkVal;
+
+    private static DoubleValue blockRecoverySpeedVal;
+
+    private static DoubleValue blockDropsRateVal;
 
     private static BooleanValue explosionDamageVal;
     private static DoubleValue explosionDamageFactorVal;
@@ -32,7 +37,9 @@ public final class SiegeConfig {
     private static BooleanValue projectileDamageVal;
     private static ConfigValue<List<? extends String>> projectileDamageFactorsVal;
 
-    public static boolean blockRecovery;
+    public static int maxDamagedBlockPerChunk;
+    public static float blockRecoverySpeed;
+    public static float blockDropsRate;
     public static boolean explosionDamage;
     public static float explosionDamageFactor;
     public static boolean projectileDamage;
@@ -45,9 +52,11 @@ public final class SiegeConfig {
 
     private SiegeConfig(ForgeConfigSpec.Builder builder) {
         builder.push("block");
-        blockRecoveryVal = builder.define("blockRecovery", true);
+        maxDamagedBlockPerChunkVal = builder.defineInRange("maxDamagedBlockPerChunk", 128, 0, 4096);
+        blockRecoverySpeedVal = builder.defineInRange("blockRecoverySpeed", .05D, 0, 4096);
+        blockDropsRateVal = builder.defineInRange("blockDropsRate", 1D, 0, 1);
         explosionDamageVal = builder.define("explosionDamage", true);
-        explosionDamageFactorVal = builder.defineInRange("explosionDamageFactor", 3f, 0, 100);
+        explosionDamageFactorVal = builder.defineInRange("explosionDamageFactor", 3D, 0, 100);
         projectileDamageVal = builder.define("projectileDamage", true);
         projectileDamageFactorsVal = builder.defineList("projectileDamageFactors", () -> Arrays.asList("arrow=1", "snowball=0.1"), $ -> {
             if ($ == null || $.getClass() != String.class) {
@@ -79,7 +88,9 @@ public final class SiegeConfig {
     }
 
     public static void refresh() {
-        blockRecovery = blockRecoveryVal.get();
+        maxDamagedBlockPerChunk = maxDamagedBlockPerChunkVal.get();
+        blockRecoverySpeed = blockRecoverySpeedVal.get().floatValue();
+        blockDropsRate = blockDropsRateVal.get().floatValue();
         explosionDamage = explosionDamageVal.get();
         explosionDamageFactor = explosionDamageFactorVal.get().floatValue();
         projectileDamage = projectileDamageVal.get();
