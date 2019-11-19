@@ -29,15 +29,15 @@ public class ProjectileModule extends AbstractModule {
             return;
         }
         PlayerEntity player = event.getPlayer();
+        Random rand = player.getRNG();
         float f = -MathHelper.sin(player.rotationYaw * ((float) Math.PI / 180F)) * MathHelper.cos(player.rotationPitch * ((float) Math.PI / 180F));
         float f1 = -MathHelper.sin(player.rotationPitch * ((float) Math.PI / 180F));
         float f2 = MathHelper.cos(player.rotationYaw * ((float) Math.PI / 180F)) * MathHelper.cos(player.rotationPitch * ((float) Math.PI / 180F));
         SmallFireballEntity fireball = new SmallFireballEntity(event.getWorld(), player, f, f1, f2);
-        Vec3d acel = new Vec3d(f, f1, f2).normalize().scale(0.2);
-        fireball.accelerationX = acel.x;
-        fireball.accelerationY = acel.y;
-        fireball.accelerationZ = acel.z;
-        Random rand = player.getRNG();
+        Vec3d acel = new Vec3d(f + rand.nextGaussian() * 0.05, f1 + rand.nextGaussian() * 0.05, f2 + rand.nextGaussian() * 0.05).normalize().scale(0.2);
+        fireball.accelerationX = acel.x + player.getMotion().x;
+        fireball.accelerationY = acel.y + player.getMotion().y;
+        fireball.accelerationZ = acel.z + player.getMotion().z;
         event.getWorld().playSound(null, player.getPosition().up(), SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.BLOCKS, 1.0F, (rand.nextFloat() - rand.nextFloat()) * 0.2F + 1.0F);
         fireball.setPosition(player.posX, player.posY + player.getEyeHeight(), player.posZ);
         event.getWorld().addEntity(Util.make(fireball, e -> e.setStack(stack)));
