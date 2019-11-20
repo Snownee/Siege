@@ -1,11 +1,15 @@
 package snownee.siege;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import com.google.common.collect.Sets;
 
 import it.unimi.dsi.fastutil.objects.Object2FloatArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
@@ -19,11 +23,14 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.config.ModConfig;
+import snownee.kiwi.util.Util;
 
 @EventBusSubscriber(bus = Bus.MOD)
 public final class SiegeConfig {
 
     static final ForgeConfigSpec spec;
+
+    private static ConfigValue<List<? extends String>> blacklistWorldsVal;
 
     private static IntValue maxDamagedBlockPerChunkVal;
 
@@ -41,6 +48,7 @@ public final class SiegeConfig {
     private static DoubleValue fireballVelocityVal;
     private static DoubleValue fireballInaccuracyVal;
 
+    public static final Set<ResourceLocation> blacklistWorlds = Sets.newHashSet();
     public static int maxDamagedBlockPerChunk;
     public static float blockRecoverySpeed;
     public static int blockRecoveryDelay;
@@ -59,6 +67,9 @@ public final class SiegeConfig {
 
     private SiegeConfig(ForgeConfigSpec.Builder builder) {
         builder.push("block");
+        blacklistWorldsVal = builder.defineList("blacklistWorlds", Collections.EMPTY_LIST, $ -> {
+            return $ instanceof String && ResourceLocation.isResouceNameValid((String) $);
+        });
         maxDamagedBlockPerChunkVal = builder.defineInRange("maxDamagedBlockPerChunk", 128, 0, 4096);
         blockRecoverySpeedVal = builder.defineInRange("blockRecoverySpeed", .05D, 0, 4096);
         blockRecoveryDelayVal = builder.defineInRange("blockRecoveryDelay", 120, 0, 3600);
@@ -100,6 +111,8 @@ public final class SiegeConfig {
     }
 
     public static void refresh() {
+        blacklistWorlds.clear();
+        blacklistWorlds.addAll(blacklistWorldsVal.get().stream().map(Util::RL).collect(Collectors.toSet()));
         maxDamagedBlockPerChunk = maxDamagedBlockPerChunkVal.get();
         blockRecoverySpeed = blockRecoverySpeedVal.get().floatValue();
         blockRecoveryDelay = blockRecoveryDelayVal.get();

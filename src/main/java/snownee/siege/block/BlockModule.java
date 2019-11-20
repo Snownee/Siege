@@ -9,6 +9,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
@@ -71,6 +72,10 @@ public class BlockModule extends AbstractModule {
 
     @SubscribeEvent
     public void attachChunkCapability(AttachCapabilitiesEvent<Chunk> event) {
+        ResourceLocation id = event.getObject().getWorld().getDimension().getType().getRegistryName();
+        if (SiegeConfig.blacklistWorlds.contains(id)) {
+            return;
+        }
         event.addCapability(DefaultBlockProgress.PROGRESS_ID, new BlockProgressProvider(event.getObject()));
     }
 
