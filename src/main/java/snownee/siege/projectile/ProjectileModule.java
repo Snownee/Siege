@@ -1,4 +1,4 @@
-package snownee.siege.fire_charge;
+package snownee.siege.projectile;
 
 import java.util.Random;
 
