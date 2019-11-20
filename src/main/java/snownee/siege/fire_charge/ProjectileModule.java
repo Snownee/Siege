@@ -16,6 +16,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import snownee.kiwi.AbstractModule;
 import snownee.kiwi.KiwiModule;
+import snownee.siege.SiegeConfig;
 
 @KiwiModule(name = "projectile")
 @KiwiModule.Optional
@@ -34,7 +35,7 @@ public class ProjectileModule extends AbstractModule {
         float f1 = -MathHelper.sin(player.rotationPitch * ((float) Math.PI / 180F));
         float f2 = MathHelper.cos(player.rotationYaw * ((float) Math.PI / 180F)) * MathHelper.cos(player.rotationPitch * ((float) Math.PI / 180F));
         SmallFireballEntity fireball = new SmallFireballEntity(event.getWorld(), player, f, f1, f2);
-        Vec3d acel = new Vec3d(f + rand.nextGaussian() * 0.05, f1 + rand.nextGaussian() * 0.05, f2 + rand.nextGaussian() * 0.05).normalize().scale(0.2);
+        Vec3d acel = new Vec3d(f + rand.nextGaussian() * SiegeConfig.fireballInaccuracy, f1 + rand.nextGaussian() * SiegeConfig.fireballInaccuracy, f2 + rand.nextGaussian() * SiegeConfig.fireballInaccuracy).normalize().scale(SiegeConfig.fireballVelocity);
         fireball.accelerationX = acel.x + player.getMotion().x;
         fireball.accelerationY = acel.y + player.getMotion().y;
         fireball.accelerationZ = acel.z + player.getMotion().z;

@@ -38,6 +38,9 @@ public final class SiegeConfig {
     private static BooleanValue projectileDamageVal;
     private static ConfigValue<List<? extends String>> projectileDamageFactorsVal;
 
+    private static DoubleValue fireballVelocityVal;
+    private static DoubleValue fireballInaccuracyVal;
+
     public static int maxDamagedBlockPerChunk;
     public static float blockRecoverySpeed;
     public static int blockRecoveryDelay;
@@ -45,6 +48,8 @@ public final class SiegeConfig {
     public static boolean explosionDamage;
     public static float explosionDamageFactor;
     public static boolean projectileDamage;
+    public static float fireballVelocity;
+    public static float fireballInaccuracy;
     public static final Object2FloatMap<ResourceLocation> projectileDamageFactors = new Object2FloatArrayMap<>();
 
     static {
@@ -82,6 +87,10 @@ public final class SiegeConfig {
             }
             return true;
         });
+
+        builder.pop().push("projectile");
+        fireballVelocityVal = builder.defineInRange("fireballVelocity", 0.2, 0.001, 10);
+        fireballInaccuracyVal = builder.defineInRange("fireballInaccuracy", 0.05, 0, 1);
     }
 
     @SubscribeEvent
@@ -112,5 +121,8 @@ public final class SiegeConfig {
                 projectileDamageFactors.put(new ResourceLocation(parts[0]), f);
             } catch (Exception e) {}
         });
+
+        fireballVelocity = fireballVelocityVal.get().floatValue();
+        fireballInaccuracy = fireballInaccuracyVal.get().floatValue();
     }
 }
