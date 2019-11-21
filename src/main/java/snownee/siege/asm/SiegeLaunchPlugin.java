@@ -16,6 +16,7 @@ public final class SiegeLaunchPlugin extends AbstractLaunchPlugin {
         registerTransformer(new ExplosionTransformer("client_explosion", "net.minecraft.world.World"));
         registerTransformer(new ExplosionTransformer("server_explosion", "net.minecraft.world.server.ServerWorld"));
         registerTransformer(new ChunkTransformer());
+        registerTransformer(new WorldRendererTransformer());
     }
 
     @Override

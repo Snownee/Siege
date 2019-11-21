@@ -46,7 +46,7 @@ public final class ChunkTransformer extends SingleTargetMethodTransformer {
                     super.visitVarInsn(Opcodes.ALOAD, 2);
                     super.visitMethodInsn(Opcodes.INVOKESTATIC, "snownee/siege/block/BlockModule", "onBlockAdded", "(Lnet/minecraft/world/chunk/Chunk;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;)V", false);
                 }
-            };
+            }
         };
     }
 
