@@ -80,14 +80,7 @@ public class BlockProgress implements IBlockProgress, INBTSerializable<CompoundN
         float progress = info.getProgress() + f / hardness;
         info.setProgress(progress, world);
         progress = info.getProgress();
-        if (progress == 0) {
-            if (sync)
-                new SyncBlockInfoPacket(pos, info.lastMine, -1).send(world);
-            return true;
-        } else if (progress < 1) {
-            if (sync)
-                new SyncBlockInfoPacket(pos, info.lastMine, info.getProgress()).send(world);
-        } else {
+        if (progress == 1) {
             boolean canDrop = false;
             ToolType toolType = state.getHarvestTool();
             if (toolType == null) {
@@ -96,11 +89,10 @@ public class BlockProgress implements IBlockProgress, INBTSerializable<CompoundN
                 canDrop = state.getHarvestLevel() <= SiegeConfig.pickaxeHarvestLevel;
             }
             world.destroyBlock(pos, canDrop && world.rand.nextFloat() < SiegeConfig.blockDropsRate);
-            if (sync)
-                new SyncBlockInfoPacket(pos, info.lastMine, -1).send(world);
-            emptyInfo(pos);
         }
-        return false;
+        if (sync)
+            sync(pos, info);
+        return progress == 0;
     }
 
     @Override
@@ -120,5 +112,14 @@ public class BlockProgress implements IBlockProgress, INBTSerializable<CompoundN
 
     public boolean outOfLimit() {
         return progressData.size() >= SiegeConfig.maxDamagedBlockPerChunk;
+    }
+
+    @Override
+    public void sync(BlockPos pos, BlockInfo info) {
+        boolean empty = info == null || info.getProgress() == 0 || info.getProgress() == 1;
+        new SyncBlockInfoPacket(pos, info.lastMine, empty ? -1 : info.getProgress()).send(chunk.getWorld());
+        if (info == null || info.getProgress() == 0) {
+            emptyInfo(pos);
+        }
     }
 }

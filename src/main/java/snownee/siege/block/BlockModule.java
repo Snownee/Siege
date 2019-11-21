@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -16,11 +17,13 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent.Phase;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
@@ -134,6 +137,15 @@ public class BlockModule extends AbstractModule {
 
     public static boolean canDamage(BlockState state) {
         return state.isSolid() && state.getBlock().blockHardness >= 0;
+    }
+
+    @SubscribeEvent
+    public void createPlayer(EntityJoinWorldEvent event) {
+        Entity entity = event.getEntity();
+        if (entity instanceof ServerPlayerEntity) {
+            ((ServerPlayerEntity) entity).interactionManager = new SiegeInteractionManager((ServerWorld) entity.world);
+            ((ServerPlayerEntity) entity).interactionManager.player = (ServerPlayerEntity) entity;
+        }
     }
 
     //    @SubscribeEvent

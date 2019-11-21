@@ -1,5 +1,6 @@
 package snownee.siege.block.network;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import net.minecraft.client.Minecraft;
@@ -54,7 +55,11 @@ public class SyncBlockInfoPacket extends Packet {
                 World world = Minecraft.getInstance().world;
                 IBlockProgress data = BlockModule.getBlockProgress(world, msg.pos);
                 if (msg.progress <= 0) {
-                    data.emptyInfo(msg.pos);
+                    Optional<BlockInfo> info = data.getInfo(msg.pos);
+                    if (info.isPresent()) {
+                        data.emptyInfo(msg.pos);
+                        world.sendBlockBreakProgress(info.get().breakerID, msg.pos, -1);
+                    }
                 } else {
                     BlockInfo info = data.getOrCreateInfo(msg.pos);
                     info.setProgress(msg.progress, msg.lastMine);

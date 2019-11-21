@@ -49,4 +49,7 @@ public class DefaultBlockProgress implements IBlockProgress {
     public Map<BlockPos, BlockInfo> getAllData() {
         return new HashMap<>();
     }
+
+    @Override
+    public void sync(BlockPos pos, BlockInfo info) {}
 }

@@ -28,4 +28,6 @@ public interface IBlockProgress {
 
     Map<BlockPos, BlockInfo> getAllData();
 
+    void sync(BlockPos pos, BlockInfo info);
+
 }
