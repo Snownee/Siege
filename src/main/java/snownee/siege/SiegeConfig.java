@@ -23,6 +23,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import snownee.kiwi.util.Util;
 
 @EventBusSubscriber(bus = Bus.MOD)
@@ -112,6 +113,11 @@ public final class SiegeConfig {
     @SubscribeEvent
     public static void onFileChange(ModConfig.ConfigReloading event) {
         ((CommentedFileConfig) event.getConfig().getConfigData()).load();
+        refresh();
+    }
+
+    @SubscribeEvent
+    public static void loadComplete(FMLLoadCompleteEvent event) {
         refresh();
     }
 
