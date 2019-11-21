@@ -22,7 +22,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -81,7 +80,7 @@ public class BlockModule extends AbstractModule {
 
     @SubscribeEvent
     public void onProjectileImpact(ProjectileImpactEvent event) {
-        if (!SiegeConfig.projectileDamage) {
+        if (SiegeConfig.projectileDamage <= 0) {
             return;
         }
         Entity entity = event.getEntity();
@@ -99,7 +98,7 @@ public class BlockModule extends AbstractModule {
         }
         Chunk chunk = world.getChunkAt(entity.getPosition());
         chunk.getCapability(SiegeCapabilities.BLOCK_PROGRESS).ifPresent(data -> {
-            double vel = entity.getMotion().squareDistanceTo(Vec3d.ZERO);
+            double vel = entity.getMotion().squareDistanceTo(Vec3d.ZERO) * SiegeConfig.projectileDamage;
             data.destroy(trace.getPos(), (float) vel * SiegeConfig.projectileDamageFactors.getOrDefault(entity.getType().getRegistryName(), 1));
             if (entity instanceof AbstractArrowEntity) {
                 Scheduler.add(new SimpleGlobalTask(LogicalSide.SERVER, Phase.END, s -> {
@@ -134,11 +133,37 @@ public class BlockModule extends AbstractModule {
     }
 
     public static boolean canDamage(BlockState state) {
-        return state.isSolid() && state.getBlock().blockHardness > 0;
+        return state.isSolid() && state.getBlock().blockHardness >= 0;
     }
 
-    @SubscribeEvent
-    public void damageBlock(PlayerEvent.BreakSpeed event) {
-        //System.out.println(event.getOriginalSpeed());
-    }
+    //    @SubscribeEvent
+    //    public void leftClickHammer(PlayerInteractEvent.LeftClickBlock event) {
+    //        if (event.getHand() != Hand.MAIN_HAND) {
+    //            return;
+    //        }
+    //        ItemStack tool = event.getItemStack();
+    //        if (!tool.getToolTypes().contains(SiegeConfig.hammerToolType)) {
+    //            return;
+    //        }
+    //        World world = event.getWorld();
+    //        BlockPos pos = event.getPos();
+    //        event.setCanceled(true);
+    //        IBlockProgress data = BlockModule.getBlockProgress(world, pos);
+    //        Optional<BlockInfo> result = data.getInfo(pos);
+    //        if (result.isPresent()) {
+    //            event.setCancellationResult(ActionResultType.SUCCESS);
+    //            int level = tool.getHarvestLevel(SiegeConfig.hammerToolType, event.getPlayer(), result.get().getBlockState(world.getChunkAt(pos), pos)) + 1;
+    //            if (level > 0) {
+    //                if (data.recover(pos, level * SiegeConfig.hammerRepairingSpeed * 0.1f)) {
+    //                    data.emptyInfo(pos);
+    //                    if (world.isRemote) {
+    //                        sendBreakAnimation(result.get().breakerID, pos, -1);
+    //                    }
+    //                }
+    //                tool.damageItem(1, event.getPlayer(), stack -> stack.sendBreakAnimation(event.getHand()));
+    //                return;
+    //            }
+    //        }
+    //        event.setCancellationResult(ActionResultType.FAIL);
+    //    }
 }

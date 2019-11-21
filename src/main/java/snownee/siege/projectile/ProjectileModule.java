@@ -43,6 +43,7 @@ public class ProjectileModule extends AbstractModule {
         fireball.setPosition(player.posX, player.posY + player.getEyeHeight(), player.posZ);
         event.getWorld().addEntity(Util.make(fireball, e -> e.setStack(stack)));
         event.setCancellationResult(ActionResultType.SUCCESS);
+        event.setCanceled(true);
         if (!player.isCreative()) {
             stack.shrink(1);
         }

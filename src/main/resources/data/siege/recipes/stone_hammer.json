@@ -1,0 +1,25 @@
+{
+  "type": "crafting_shaped",
+  "conditions": [
+    {
+      "type": "kiwi:is_loaded",
+      "module": "siege:hammer"
+    }
+  ],
+  "pattern": [
+    "###",
+    " / ",
+    " / "
+  ],
+  "key": {
+    "#": {
+      "tag": "forge:cobblestone"
+    },
+    "/": {
+      "tag": "forge:rods/wooden"
+    }
+  },
+  "result": {
+    "item": "siege:stone_hammer"
+  }
+}

@@ -15,10 +15,10 @@ import it.unimi.dsi.fastutil.objects.Object2FloatArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
 import net.minecraftforge.common.ForgeConfigSpec.IntValue;
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
@@ -39,25 +39,29 @@ public final class SiegeConfig {
 
     private static DoubleValue blockDropsRateVal;
 
-    private static BooleanValue explosionDamageVal;
-    private static DoubleValue explosionDamageFactorVal;
+    private static DoubleValue explosionDamageVal;
 
-    private static BooleanValue projectileDamageVal;
+    private static DoubleValue projectileDamageVal;
     private static ConfigValue<List<? extends String>> projectileDamageFactorsVal;
+
+    private static DoubleValue hammerRepairingSpeedVal;
 
     private static DoubleValue fireballVelocityVal;
     private static DoubleValue fireballInaccuracyVal;
+
+    public static final ToolType hammerToolType = ToolType.get("engineering_hammer");
 
     public static final Set<ResourceLocation> blacklistWorlds = Sets.newHashSet();
     public static int maxDamagedBlockPerChunk;
     public static float blockRecoverySpeed;
     public static int blockRecoveryDelay;
     public static float blockDropsRate;
-    public static boolean explosionDamage;
-    public static float explosionDamageFactor;
-    public static boolean projectileDamage;
+    public static float explosionDamage;
+    public static float projectileDamage;
+    public static float hammerRepairingSpeed;
     public static float fireballVelocity;
     public static float fireballInaccuracy;
+    public static float projectileDamageModifier;
     public static final Object2FloatMap<ResourceLocation> projectileDamageFactors = new Object2FloatArrayMap<>();
 
     static {
@@ -67,17 +71,14 @@ public final class SiegeConfig {
 
     private SiegeConfig(ForgeConfigSpec.Builder builder) {
         builder.push("block");
-        blacklistWorldsVal = builder.defineList("blacklistWorlds", Collections.EMPTY_LIST, $ -> {
-            return $ instanceof String && ResourceLocation.isResouceNameValid((String) $);
-        });
+        blacklistWorldsVal = builder.defineList("blacklistWorlds", Collections.EMPTY_LIST, SiegeConfig::isResourceName);
         maxDamagedBlockPerChunkVal = builder.defineInRange("maxDamagedBlockPerChunk", 128, 0, 4096);
         blockRecoverySpeedVal = builder.defineInRange("blockRecoverySpeed", .05D, 0, 4096);
         blockRecoveryDelayVal = builder.defineInRange("blockRecoveryDelay", 120, 0, 3600);
         blockDropsRateVal = builder.defineInRange("blockDropsRate", 1D, 0, 1);
-        explosionDamageVal = builder.define("explosionDamage", true);
-        explosionDamageFactorVal = builder.defineInRange("explosionDamageFactor", 3D, 0, 100);
-        projectileDamageVal = builder.define("projectileDamage", true);
-        projectileDamageFactorsVal = builder.defineList("projectileDamageFactors", () -> Arrays.asList("arrow=1", "snowball=0.1"), $ -> {
+        explosionDamageVal = builder.defineInRange("explosionDamage", 3D, 0, 100);
+        projectileDamageVal = builder.defineInRange("projectileDamage", 0.15, 0, 10);
+        projectileDamageFactorsVal = builder.defineList("projectileDamageFactors", () -> Arrays.asList("arrow=1", "snowball=0.1", "ender_pearl=0"), $ -> {
             if ($ == null || $.getClass() != String.class) {
                 return false;
             }
@@ -98,6 +99,7 @@ public final class SiegeConfig {
             }
             return true;
         });
+        hammerRepairingSpeedVal = builder.defineInRange("hammerRepairingSpeed", 1, 0.001, 10);
 
         builder.pop().push("projectile");
         fireballVelocityVal = builder.defineInRange("fireballVelocity", 0.2, 0.001, 10);
@@ -117,9 +119,8 @@ public final class SiegeConfig {
         blockRecoverySpeed = blockRecoverySpeedVal.get().floatValue();
         blockRecoveryDelay = blockRecoveryDelayVal.get();
         blockDropsRate = blockDropsRateVal.get().floatValue();
-        explosionDamage = explosionDamageVal.get();
-        explosionDamageFactor = explosionDamageFactorVal.get().floatValue();
-        projectileDamage = projectileDamageVal.get();
+        explosionDamage = explosionDamageVal.get().floatValue();
+        projectileDamage = projectileDamageVal.get().floatValue();
         projectileDamageFactors.clear();
         projectileDamageFactorsVal.get().forEach(s -> {
             String[] parts = s.split("=");
@@ -134,8 +135,13 @@ public final class SiegeConfig {
                 projectileDamageFactors.put(new ResourceLocation(parts[0]), f);
             } catch (Exception e) {}
         });
+        hammerRepairingSpeed = hammerRepairingSpeedVal.get().floatValue();
 
         fireballVelocity = fireballVelocityVal.get().floatValue();
         fireballInaccuracy = fireballInaccuracyVal.get().floatValue();
+    }
+
+    private static boolean isResourceName(Object $) {
+        return $ instanceof String && ResourceLocation.isResouceNameValid((String) $);
     }
 }
