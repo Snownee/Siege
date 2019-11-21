@@ -14,6 +14,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.INBTSerializable;
 import snownee.siege.SiegeConfig;
 import snownee.siege.block.BlockModule;
@@ -87,7 +88,14 @@ public class BlockProgress implements IBlockProgress, INBTSerializable<CompoundN
             if (sync)
                 new SyncBlockInfoPacket(pos, info.lastMine, info.getProgress()).send(world);
         } else {
-            world.destroyBlock(pos, world.rand.nextFloat() < SiegeConfig.blockDropsRate);
+            boolean canDrop = false;
+            ToolType toolType = state.getHarvestTool();
+            if (toolType == null) {
+                canDrop = true;
+            } else if (toolType == ToolType.PICKAXE) {
+                canDrop = state.getHarvestLevel() <= SiegeConfig.pickaxeHarvestLevel;
+            }
+            world.destroyBlock(pos, canDrop && world.rand.nextFloat() < SiegeConfig.blockDropsRate);
             if (sync)
                 new SyncBlockInfoPacket(pos, info.lastMine, -1).send(world);
             emptyInfo(pos);

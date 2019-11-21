@@ -35,9 +35,10 @@ public final class SiegeConfig {
     private static IntValue maxDamagedBlockPerChunkVal;
 
     private static DoubleValue blockRecoverySpeedVal;
-    public static IntValue blockRecoveryDelayVal;
+    private static IntValue blockRecoveryDelayVal;
 
     private static DoubleValue blockDropsRateVal;
+    private static IntValue pickaxeHarvestLevelVal;
 
     private static DoubleValue explosionDamageVal;
 
@@ -56,6 +57,7 @@ public final class SiegeConfig {
     public static float blockRecoverySpeed;
     public static int blockRecoveryDelay;
     public static float blockDropsRate;
+    public static int pickaxeHarvestLevel;
     public static float explosionDamage;
     public static float projectileDamage;
     public static float hammerRepairingSpeed;
@@ -76,6 +78,7 @@ public final class SiegeConfig {
         blockRecoverySpeedVal = builder.defineInRange("blockRecoverySpeed", .05D, 0, 4096);
         blockRecoveryDelayVal = builder.defineInRange("blockRecoveryDelay", 120, 0, 3600);
         blockDropsRateVal = builder.defineInRange("blockDropsRate", 1D, 0, 1);
+        pickaxeHarvestLevelVal = builder.defineInRange("pickaxeHarvestLevel", 2, -1, 1000);
         explosionDamageVal = builder.defineInRange("explosionDamage", 3D, 0, 100);
         projectileDamageVal = builder.defineInRange("projectileDamage", 0.15, 0, 10);
         projectileDamageFactorsVal = builder.defineList("projectileDamageFactors", () -> Arrays.asList("arrow=1", "snowball=0.1", "ender_pearl=0"), $ -> {
@@ -119,6 +122,7 @@ public final class SiegeConfig {
         blockRecoverySpeed = blockRecoverySpeedVal.get().floatValue();
         blockRecoveryDelay = blockRecoveryDelayVal.get();
         blockDropsRate = blockDropsRateVal.get().floatValue();
+        pickaxeHarvestLevel = pickaxeHarvestLevelVal.get();
         explosionDamage = explosionDamageVal.get().floatValue();
         projectileDamage = projectileDamageVal.get().floatValue();
         projectileDamageFactors.clear();
