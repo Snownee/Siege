@@ -9,11 +9,13 @@ import net.minecraft.network.play.client.CPlayerDiggingPacket;
 import net.minecraft.network.play.server.SPlayerDiggingPacket;
 import net.minecraft.server.management.PlayerInteractionManager;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.server.ServerWorld;
 import snownee.siege.SiegeConfig;
 import snownee.siege.block.capability.IBlockProgress;
 import snownee.siege.block.impl.BlockInfo;
+import snownee.siege.hammer.HammerItem;
 
 //TODO: patch PlayerController and break sound
 public class SiegeInteractionManager extends PlayerInteractionManager {
@@ -147,7 +149,9 @@ public class SiegeInteractionManager extends PlayerInteractionManager {
         IBlockProgress data = BlockModule.getBlockProgress(this.player.world, pos);
         BlockInfo info = data.getOrCreateInfo(pos);
         float f = getNewProgress(stack, state, pos);
-        System.out.println(f);
+        if (f < 0 && survivalOrAdventure() && stack.getItem() instanceof HammerItem) {
+            stack.damageItem((int) (f * -100), player, $ -> $.sendBreakAnimation(Hand.MAIN_HAND));
+        }
         f += info.getProgress();
         if (f <= 0) {
             data.emptyInfo(pos);

@@ -15,6 +15,7 @@ import it.unimi.dsi.fastutil.objects.Object2FloatArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
 import net.minecraftforge.common.ForgeConfigSpec.IntValue;
@@ -47,6 +48,7 @@ public final class SiegeConfig {
     private static ConfigValue<List<? extends String>> projectileDamageFactorsVal;
 
     private static DoubleValue hammerRepairingSpeedVal;
+    private static BooleanValue hammerDurabilityVal;
 
     private static DoubleValue fireballVelocityVal;
     private static DoubleValue fireballInaccuracyVal;
@@ -62,6 +64,7 @@ public final class SiegeConfig {
     public static float explosionDamage;
     public static float projectileDamage;
     public static float hammerRepairingSpeed;
+    public static boolean hammerDurability;
     public static float fireballVelocity;
     public static float fireballInaccuracy;
     public static float projectileDamageModifier;
@@ -105,6 +108,9 @@ public final class SiegeConfig {
         });
         hammerRepairingSpeedVal = builder.defineInRange("hammerRepairingSpeed", 0.02, 0.0001, 10);
 
+        builder.pop().push("hammer");
+        hammerDurabilityVal = builder.define("durability", true);
+
         builder.pop().push("projectile");
         fireballVelocityVal = builder.defineInRange("fireballVelocity", 0.2, 0.001, 10);
         fireballInaccuracyVal = builder.defineInRange("fireballInaccuracy", 0.05, 0, 1);
@@ -146,6 +152,8 @@ public final class SiegeConfig {
             } catch (Exception e) {}
         });
         hammerRepairingSpeed = hammerRepairingSpeedVal.get().floatValue();
+
+        hammerDurability = hammerDurabilityVal.get();
 
         fireballVelocity = fireballVelocityVal.get().floatValue();
         fireballInaccuracy = fireballInaccuracyVal.get().floatValue();
