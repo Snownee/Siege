@@ -19,7 +19,6 @@ import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
 import net.minecraftforge.common.ForgeConfigSpec.IntValue;
-import net.minecraftforge.common.ToolType;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
@@ -52,8 +51,6 @@ public final class SiegeConfig {
 
     private static DoubleValue fireballVelocityVal;
     private static DoubleValue fireballInaccuracyVal;
-
-    public static final ToolType hammerToolType = ToolType.get("engineering_hammer");
 
     public static final Set<ResourceLocation> blacklistWorlds = Sets.newHashSet();
     public static int maxDamagedBlockPerChunk;

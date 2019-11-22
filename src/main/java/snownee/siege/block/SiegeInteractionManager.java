@@ -48,10 +48,11 @@ public class SiegeInteractionManager extends PlayerInteractionManager {
     /*
      * process digging
      */
+    @Override
     public void func_225416_a(BlockPos pos, CPlayerDiggingPacket.Action action, Direction direction, int heightLimit) {
-        double d0 = this.player.posX - ((double) pos.getX() + 0.5D);
-        double d1 = this.player.posY - ((double) pos.getY() + 0.5D) + 1.5D;
-        double d2 = this.player.posZ - ((double) pos.getZ() + 0.5D);
+        double d0 = this.player.posX - (pos.getX() + 0.5D);
+        double d1 = this.player.posY - (pos.getY() + 0.5D) + 1.5D;
+        double d2 = this.player.posZ - (pos.getZ() + 0.5D);
         double d3 = d0 * d0 + d1 * d1 + d2 * d2;
         double dist = player.getAttribute(net.minecraft.entity.player.PlayerEntity.REACH_DISTANCE).getValue() + 1;
         net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock event = net.minecraftforge.common.ForgeHooks.onLeftClickBlock(player, pos, direction);
@@ -164,7 +165,7 @@ public class SiegeInteractionManager extends PlayerInteractionManager {
     }
 
     private float getNewProgress(ItemStack stack, BlockState state, BlockPos pos) {
-        if (stack.getToolTypes().contains(SiegeConfig.hammerToolType)) {
+        if (stack.getToolTypes().contains(BlockModule.hammerToolType)) {
             float f = state.getBlockHardness(player.world, pos);
             if (f == -1) {
                 return 0;

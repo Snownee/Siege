@@ -33,7 +33,7 @@ public class BlockRecoverHandler {
     @SubscribeEvent
     public static void unloadChunk(ChunkEvent.Unload event) {
         if (event.getChunk() instanceof Chunk) {
-            chunks.remove(event.getWorld(), (Chunk) event.getChunk());
+            chunks.remove(event.getWorld(), event.getChunk());
             //System.out.println(chunks.size());
         }
     }

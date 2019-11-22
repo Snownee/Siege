@@ -31,6 +31,7 @@ public class SiegeExplosion extends Explosion {
         super(worldIn, exploderIn, xIn, yIn, zIn, sizeIn, causesFireIn, modeIn);
     }
 
+    @Override
     public void doExplosionA() {
         Set<BlockPos> set = Sets.newHashSet();
         int i = 16;
@@ -39,9 +40,9 @@ public class SiegeExplosion extends Explosion {
             for (int k = 0; k < 16; ++k) {
                 for (int l = 0; l < 16; ++l) {
                     if (j == 0 || j == 15 || k == 0 || k == 15 || l == 0 || l == 15) {
-                        double d0 = (double) ((float) j / 15.0F * 2.0F - 1.0F);
-                        double d1 = (double) ((float) k / 15.0F * 2.0F - 1.0F);
-                        double d2 = (double) ((float) l / 15.0F * 2.0F - 1.0F);
+                        double d0 = j / 15.0F * 2.0F - 1.0F;
+                        double d1 = k / 15.0F * 2.0F - 1.0F;
+                        double d2 = l / 15.0F * 2.0F - 1.0F;
                         double d3 = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
                         d0 = d0 / d3;
                         d1 = d1 / d3;
@@ -75,9 +76,9 @@ public class SiegeExplosion extends Explosion {
                                 set.add(blockpos);
                             }
 
-                            d4 += d0 * (double) 0.3F;
-                            d6 += d1 * (double) 0.3F;
-                            d8 += d2 * (double) 0.3F;
+                            d4 += d0 * 0.3F;
+                            d6 += d1 * 0.3F;
+                            d8 += d2 * 0.3F;
                         }
                     }
                 }
@@ -86,32 +87,32 @@ public class SiegeExplosion extends Explosion {
 
         this.getAffectedBlockPositions().addAll(set);
         float f3 = this.size * 2.0F;
-        int k1 = MathHelper.floor(this.x - (double) f3 - 1.0D);
-        int l1 = MathHelper.floor(this.x + (double) f3 + 1.0D);
-        int i2 = MathHelper.floor(this.y - (double) f3 - 1.0D);
-        int i1 = MathHelper.floor(this.y + (double) f3 + 1.0D);
-        int j2 = MathHelper.floor(this.z - (double) f3 - 1.0D);
-        int j1 = MathHelper.floor(this.z + (double) f3 + 1.0D);
-        List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(this.exploder, new AxisAlignedBB((double) k1, (double) i2, (double) j2, (double) l1, (double) i1, (double) j1));
+        int k1 = MathHelper.floor(this.x - f3 - 1.0D);
+        int l1 = MathHelper.floor(this.x + f3 + 1.0D);
+        int i2 = MathHelper.floor(this.y - f3 - 1.0D);
+        int i1 = MathHelper.floor(this.y + f3 + 1.0D);
+        int j2 = MathHelper.floor(this.z - f3 - 1.0D);
+        int j1 = MathHelper.floor(this.z + f3 + 1.0D);
+        List<Entity> list = this.world.getEntitiesWithinAABBExcludingEntity(this.exploder, new AxisAlignedBB(k1, i2, j2, l1, i1, j1));
         net.minecraftforge.event.ForgeEventFactory.onExplosionDetonate(this.world, this, list, f3);
         Vec3d vec3d = new Vec3d(this.x, this.y, this.z);
 
         for (int k2 = 0; k2 < list.size(); ++k2) {
             Entity entity = list.get(k2);
             if (!entity.isImmuneToExplosions()) {
-                double d12 = (double) (MathHelper.sqrt(entity.getDistanceSq(new Vec3d(this.x, this.y, this.z))) / f3);
+                double d12 = MathHelper.sqrt(entity.getDistanceSq(new Vec3d(this.x, this.y, this.z))) / f3;
                 if (d12 <= 1.0D) {
                     double d5 = entity.posX - this.x;
-                    double d7 = entity.posY + (double) entity.getEyeHeight() - this.y;
+                    double d7 = entity.posY + entity.getEyeHeight() - this.y;
                     double d9 = entity.posZ - this.z;
-                    double d13 = (double) MathHelper.sqrt(d5 * d5 + d7 * d7 + d9 * d9);
+                    double d13 = MathHelper.sqrt(d5 * d5 + d7 * d7 + d9 * d9);
                     if (d13 != 0.0D) {
                         d5 = d5 / d13;
                         d7 = d7 / d13;
                         d9 = d9 / d13;
-                        double d14 = (double) func_222259_a(vec3d, entity);
+                        double d14 = func_222259_a(vec3d, entity);
                         double d10 = (1.0D - d12) * d14;
-                        entity.attackEntityFrom(this.getDamageSource(), (float) ((int) ((d10 * d10 + d10) / 2.0D * 7.0D * (double) f3 + 1.0D)));
+                        entity.attackEntityFrom(this.getDamageSource(), ((int) ((d10 * d10 + d10) / 2.0D * 7.0D * f3 + 1.0D)));
                         double d11 = d10;
                         if (entity instanceof LivingEntity) {
                             d11 = ProtectionEnchantment.getBlastDamageReduction((LivingEntity) entity, d10);

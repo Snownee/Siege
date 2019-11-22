@@ -23,6 +23,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.ToolType;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -51,6 +52,8 @@ import snownee.siege.block.network.SyncBlockInfoPacket;
 public class BlockModule extends AbstractModule {
 
     public static BlockModule INSTANCE;
+
+    public static final ToolType hammerToolType = ToolType.get("engineering_hammer");
 
     @Override
     protected void init(FMLCommonSetupEvent event) {
