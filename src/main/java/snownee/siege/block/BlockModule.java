@@ -144,41 +144,12 @@ public class BlockModule extends AbstractModule {
     public void createPlayer(EntityJoinWorldEvent event) {
         Entity entity = event.getEntity();
         if (entity instanceof ServerPlayerEntity) {
-            GameType gameType = ((ServerPlayerEntity) entity).interactionManager.getGameType();
-            ((ServerPlayerEntity) entity).interactionManager = new SiegeInteractionManager((ServerWorld) entity.world);
-            ((ServerPlayerEntity) entity).interactionManager.player = (ServerPlayerEntity) entity;
-            ((ServerPlayerEntity) entity).interactionManager.setGameType(gameType);
+            ServerPlayerEntity player = (ServerPlayerEntity) entity;
+            GameType gameType = player.interactionManager.getGameType();
+            player.interactionManager = new SiegeInteractionManager((ServerWorld) entity.world);
+            player.interactionManager.player = player;
+            player.interactionManager.setGameType(gameType);
         }
     }
 
-    //    @SubscribeEvent
-    //    public void leftClickHammer(PlayerInteractEvent.LeftClickBlock event) {
-    //        if (event.getHand() != Hand.MAIN_HAND) {
-    //            return;
-    //        }
-    //        ItemStack tool = event.getItemStack();
-    //        if (!tool.getToolTypes().contains(SiegeConfig.hammerToolType)) {
-    //            return;
-    //        }
-    //        World world = event.getWorld();
-    //        BlockPos pos = event.getPos();
-    //        event.setCanceled(true);
-    //        IBlockProgress data = BlockModule.getBlockProgress(world, pos);
-    //        Optional<BlockInfo> result = data.getInfo(pos);
-    //        if (result.isPresent()) {
-    //            event.setCancellationResult(ActionResultType.SUCCESS);
-    //            int level = tool.getHarvestLevel(SiegeConfig.hammerToolType, event.getPlayer(), result.get().getBlockState(world.getChunkAt(pos), pos)) + 1;
-    //            if (level > 0) {
-    //                if (data.recover(pos, level * SiegeConfig.hammerRepairingSpeed * 0.1f)) {
-    //                    data.emptyInfo(pos);
-    //                    if (world.isRemote) {
-    //                        sendBreakAnimation(result.get().breakerID, pos, -1);
-    //                    }
-    //                }
-    //                tool.damageItem(1, event.getPlayer(), stack -> stack.sendBreakAnimation(event.getHand()));
-    //                return;
-    //            }
-    //        }
-    //        event.setCancellationResult(ActionResultType.FAIL);
-    //    }
 }

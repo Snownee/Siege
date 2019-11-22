@@ -103,7 +103,7 @@ public final class SiegeConfig {
             }
             return true;
         });
-        hammerRepairingSpeedVal = builder.defineInRange("hammerRepairingSpeed", 1, 0.001, 10);
+        hammerRepairingSpeedVal = builder.defineInRange("hammerRepairingSpeed", 0.02, 0.0001, 10);
 
         builder.pop().push("projectile");
         fireballVelocityVal = builder.defineInRange("fireballVelocity", 0.2, 0.001, 10);
