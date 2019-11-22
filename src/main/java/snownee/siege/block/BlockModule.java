@@ -21,6 +21,7 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent.Phase;
@@ -39,6 +40,7 @@ import snownee.siege.SiegeConfig;
 import snownee.siege.block.capability.BlockProgressProvider;
 import snownee.siege.block.capability.DefaultBlockProgress;
 import snownee.siege.block.capability.IBlockProgress;
+import snownee.siege.block.client.SiegePlayerController;
 import snownee.siege.block.impl.BlockInfo;
 import snownee.siege.block.network.SyncBlockInfoPacket;
 
@@ -150,6 +152,15 @@ public class BlockModule extends AbstractModule {
             player.interactionManager.player = player;
             player.interactionManager.setGameType(gameType);
         }
+    }
+
+    @SubscribeEvent
+    @OnlyIn(Dist.CLIENT)
+    public void playerLogIn(ClientPlayerNetworkEvent.LoggedInEvent event) {
+        Minecraft mc = Minecraft.getInstance();
+        GameType gameType = mc.playerController.getCurrentGameType();
+        mc.playerController = new SiegePlayerController(mc, mc.getConnection());
+        mc.playerController.setGameType(gameType);
     }
 
 }
