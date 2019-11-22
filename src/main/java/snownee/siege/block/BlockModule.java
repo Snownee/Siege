@@ -15,6 +15,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.server.ServerWorld;
@@ -143,8 +144,10 @@ public class BlockModule extends AbstractModule {
     public void createPlayer(EntityJoinWorldEvent event) {
         Entity entity = event.getEntity();
         if (entity instanceof ServerPlayerEntity) {
+            GameType gameType = ((ServerPlayerEntity) entity).interactionManager.getGameType();
             ((ServerPlayerEntity) entity).interactionManager = new SiegeInteractionManager((ServerWorld) entity.world);
             ((ServerPlayerEntity) entity).interactionManager.player = (ServerPlayerEntity) entity;
+            ((ServerPlayerEntity) entity).interactionManager.setGameType(gameType);
         }
     }
 
