@@ -150,8 +150,8 @@ public class SiegeInteractionManager extends PlayerInteractionManager {
         IBlockProgress data = BlockModule.getBlockProgress(this.player.world, pos);
         BlockInfo info = data.getOrCreateInfo(pos);
         float f = getNewProgress(stack, state, pos);
-        if (f < 0 && survivalOrAdventure() && stack.getItem() instanceof HammerItem) {
-            stack.damageItem((int) (f * -100), player, $ -> $.sendBreakAnimation(Hand.MAIN_HAND));
+        if (f < 0 && info.getProgress() > 0 && survivalOrAdventure() && stack.getItem() instanceof HammerItem) {
+            stack.damageItem(1, player, $ -> $.sendBreakAnimation(Hand.MAIN_HAND));
         }
         f += info.getProgress();
         if (f <= 0) {
