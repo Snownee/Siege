@@ -33,6 +33,7 @@ public class SiegeInteractionManager extends PlayerInteractionManager {
                 return;
             } else {
                 float f = this.destory(player.getHeldItemMainhand(), state, this.destroyPos);
+                //System.out.println(f);
                 if (f <= 0) {
                     this.isDestroyingBlock = false;
                     this.receivedFinishDiggingPacket = false;
@@ -96,7 +97,7 @@ public class SiegeInteractionManager extends PlayerInteractionManager {
                 if (!blockstate.isAir(world, pos)) {
                     if (event.getUseBlock() != net.minecraftforge.eventbus.api.Event.Result.DENY)
                         blockstate.onBlockClicked(this.world, pos, this.player);
-                    f = getNewProgress(stack, blockstate, pos);
+                    f = getNewProgress(player, stack, blockstate, pos);
                 }
 
                 if (!blockstate.isAir(world, pos) && f >= 1.0F) {
@@ -104,7 +105,7 @@ public class SiegeInteractionManager extends PlayerInteractionManager {
                 } else {
                     this.isDestroyingBlock = true;
                     this.destroyPos = pos;
-                    int i = (int) (f * 10.0F);
+                    //int i = (int) (f * 10.0F);
                     //this.world.sendBlockBreakProgress(this.player.getEntityId(), p_225416_1_, i);
                     this.player.connection.sendPacket(new SPlayerDiggingPacket(pos, this.world.getBlockState(pos), action, true));
                     //this.durabilityRemainingOnBlock = i;
@@ -115,7 +116,7 @@ public class SiegeInteractionManager extends PlayerInteractionManager {
                     BlockState blockstate1 = this.world.getBlockState(pos);
                     if (!blockstate1.isAir()) {
 
-                        float f1 = getNewProgress(stack, blockstate1, pos);
+                        float f1 = getNewProgress(player, stack, blockstate1, pos);
                         Optional<BlockInfo> info = BlockModule.getInfo(world, destroyPos);
                         if (info.isPresent()) {
                             f1 += info.get().getProgress();
@@ -149,7 +150,7 @@ public class SiegeInteractionManager extends PlayerInteractionManager {
     private float destory(ItemStack stack, BlockState state, BlockPos pos) {
         IBlockProgress data = BlockModule.getBlockProgress(this.player.world, pos);
         BlockInfo info = data.getOrCreateInfo(pos);
-        float f = getNewProgress(stack, state, pos);
+        float f = getNewProgress(player, stack, state, pos);
         if (f < 0 && info.getProgress() > 0 && survivalOrAdventure() && stack.getItem() instanceof HammerItem) {
             stack.damageItem(1, player, $ -> $.sendBreakAnimation(Hand.MAIN_HAND));
         }
@@ -164,7 +165,7 @@ public class SiegeInteractionManager extends PlayerInteractionManager {
         return f;
     }
 
-    private float getNewProgress(ItemStack stack, BlockState state, BlockPos pos) {
+    public static float getNewProgress(PlayerEntity player, ItemStack stack, BlockState state, BlockPos pos) {
         if (stack.getToolTypes().contains(BlockModule.hammerToolType)) {
             float f = state.getBlockHardness(player.world, pos);
             if (f == -1) {
@@ -173,7 +174,7 @@ public class SiegeInteractionManager extends PlayerInteractionManager {
                 return player.getDigSpeed(state, pos) / -f * SiegeConfig.hammerRepairingSpeed;
             }
         } else {
-            return state.getPlayerRelativeBlockHardness(this.player, this.player.world, pos);
+            return state.getPlayerRelativeBlockHardness(player, player.world, pos);
         }
     }
 }
