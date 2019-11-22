@@ -117,7 +117,7 @@ public class BlockProgress implements IBlockProgress, INBTSerializable<CompoundN
     @Override
     public void sync(BlockPos pos, BlockInfo info) {
         boolean empty = info == null || info.getProgress() == 0 || info.getProgress() == 1;
-        new SyncBlockInfoPacket(pos, info.lastMine, empty ? -1 : info.getProgress()).send(chunk.getWorld());
+        new SyncBlockInfoPacket(pos, empty ? -1 : info.lastMine, empty ? -1 : info.getProgress()).send(chunk.getWorld());
         if (info == null || info.getProgress() == 0) {
             emptyInfo(pos);
         }
