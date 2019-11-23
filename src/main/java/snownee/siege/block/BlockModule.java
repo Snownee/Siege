@@ -145,7 +145,7 @@ public class BlockModule extends AbstractModule {
     }
 
     public static boolean canDamage(BlockState state) {
-        return state.isSolid() && state.getBlock().blockHardness >= 0;
+        return !state.isAir() && state.getBlock().blockHardness >= 0;
     }
 
     @SubscribeEvent

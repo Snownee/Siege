@@ -117,12 +117,14 @@ public class BlockProgress implements IBlockProgress {
         info.setProgress(progress, world);
         progress = info.getProgress();
         if (progress == 1) {
-            boolean canDrop = false;
-            ToolType toolType = state.getHarvestTool();
-            if (toolType == null) {
-                canDrop = true;
-            } else if (toolType == ToolType.PICKAXE) {
-                canDrop = state.getHarvestLevel() <= SiegeConfig.pickaxeHarvestLevel;
+            boolean canDrop = state.getMaterial().isToolNotRequired();
+            if (!canDrop) {
+                ToolType toolType = state.getHarvestTool();
+                if (toolType == null) {
+                    canDrop = true;
+                } else if (toolType == ToolType.PICKAXE) {
+                    canDrop = state.getHarvestLevel() <= SiegeConfig.pickaxeHarvestLevel;
+                }
             }
             world.destroyBlock(pos, canDrop && world.rand.nextFloat() < SiegeConfig.blockDropsRate);
         }
