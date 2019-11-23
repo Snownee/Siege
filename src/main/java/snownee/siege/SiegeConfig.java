@@ -90,7 +90,7 @@ public final class SiegeConfig {
             if (parts.length != 2) {
                 return false;
             }
-            if (!ResourceLocation.isResouceNameValid(parts[0])) {
+            if (Util.RL(parts[0]) == null) {
                 return false;
             }
             try {
@@ -137,7 +137,7 @@ public final class SiegeConfig {
         projectileDamageFactors.clear();
         projectileDamageFactorsVal.get().forEach(s -> {
             String[] parts = s.split("=");
-            if (parts.length != 2 || !ResourceLocation.isResouceNameValid(parts[0])) {
+            if (parts.length != 2 || Util.RL(parts[0]) == null) {
                 return;
             }
             try {

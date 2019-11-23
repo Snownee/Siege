@@ -8,6 +8,8 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 import net.minecraftforge.fml.network.PacketDistributor;
 import snownee.kiwi.network.NetworkChannel;
@@ -56,6 +58,7 @@ public class SyncBlockProgressPacket extends Packet {
         }
 
         @Override
+        @OnlyIn(Dist.CLIENT)
         public void handle(SyncBlockProgressPacket msg, Supplier<Context> ctx) {
             ctx.get().enqueueWork(() -> {
                 World world = Minecraft.getInstance().world;
