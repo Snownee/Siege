@@ -82,7 +82,7 @@ public final class SiegeConfig {
         pickaxeHarvestLevelVal = builder.defineInRange("pickaxeHarvestLevel", 2, -1, 1000);
         explosionDamageVal = builder.defineInRange("explosionDamage", 3D, 0, 100);
         projectileDamageVal = builder.defineInRange("projectileDamage", 0.15, 0, 10);
-        projectileDamageFactorsVal = builder.defineList("projectileDamageFactors", () -> Arrays.asList("arrow=1", "snowball=0.1", "ender_pearl=0"), $ -> {
+        projectileDamageFactorsVal = builder.defineList("projectileDamageFactors", () -> Arrays.asList("arrow=1.5", "spectral_arrow=1.5", "egg=0.1", "snowball=0.1", "ender_pearl=0", "llama_spit=0"), $ -> {
             if ($ == null || $.getClass() != String.class) {
                 return false;
             }
