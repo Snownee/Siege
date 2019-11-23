@@ -3,10 +3,12 @@ package snownee.siege.block.capability;
 import java.util.Map;
 import java.util.Optional;
 
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.util.INBTSerializable;
 import snownee.siege.block.impl.BlockInfo;
 
-public interface IBlockProgress {
+public interface IBlockProgress extends INBTSerializable<CompoundNBT> {
 
     Optional<BlockInfo> getInfo(BlockPos pos);
 

@@ -7,14 +7,19 @@ import java.util.Optional;
 
 import javax.annotation.Nonnull;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import com.google.common.collect.Maps;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.ToolType;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 import snownee.siege.SiegeConfig;
 import snownee.siege.block.BlockModule;
@@ -22,7 +27,7 @@ import snownee.siege.block.capability.DefaultBlockInfo;
 import snownee.siege.block.capability.IBlockProgress;
 import snownee.siege.block.network.SyncBlockInfoPacket;
 
-public class BlockProgress implements IBlockProgress, INBTSerializable<CompoundNBT> {
+public class BlockProgress implements IBlockProgress {
 
     private final Map<BlockPos, BlockInfo> progressData = Maps.newConcurrentMap();
     private final Chunk chunk;
@@ -33,12 +38,43 @@ public class BlockProgress implements IBlockProgress, INBTSerializable<CompoundN
 
     @Override
     public CompoundNBT serializeNBT() {
-        return new CompoundNBT();
+        CompoundNBT data = new CompoundNBT();
+        if (!progressData.isEmpty()) {
+            ListNBT list = new ListNBT();
+            progressData.forEach((k, v) -> list.add(writeInfo(k, v)));
+            data.put("infos", list);
+        }
+        return data;
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt) {
-        //System.out.println(nbt);
+    public void deserializeNBT(CompoundNBT data) {
+        if (!data.contains("infos", Constants.NBT.TAG_LIST)) {
+            return;
+        }
+        boolean remote = chunk.getWorld().isRemote;
+        data.getList("infos", Constants.NBT.TAG_COMPOUND).forEach(v -> {
+            Pair<BlockPos, BlockInfo> pair = readInfo((CompoundNBT) v);
+            progressData.put(pair.getKey(), pair.getValue());
+            if (remote) {
+                BlockModule.sendBreakAnimation(pair.getValue().breakerID, pair.getLeft(), pair.getValue().getProgressInt());
+            }
+        });
+    }
+
+    public static CompoundNBT writeInfo(BlockPos pos, BlockInfo info) {
+        CompoundNBT data = new CompoundNBT();
+        data.put("pos", NBTUtil.writeBlockPos(pos));
+        data.putFloat("p", info.getProgress());
+        data.putLong("t", info.lastMine);
+        return data;
+    }
+
+    public static Pair<BlockPos, BlockInfo> readInfo(CompoundNBT data) {
+        BlockPos pos = NBTUtil.readBlockPos(data.getCompound("pos"));
+        BlockInfo info = new BlockInfo();
+        info.setProgress(data.getFloat("p"), data.getLong("t"));
+        return Pair.of(pos, info);
     }
 
     @Override

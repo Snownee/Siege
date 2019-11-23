@@ -125,7 +125,7 @@ public class SiegePlayerController extends PlayerController {
                 this.mc.getTutorial().onHitBlock(this.mc.world, posBlock, blockstate, MathHelper.clamp(this.curBlockDamageMP, 0.0F, 1.0F));
                 if (net.minecraftforge.common.ForgeHooks.onLeftClickBlock(this.mc.player, posBlock, directionFacing).getUseItem() == net.minecraftforge.eventbus.api.Event.Result.DENY)
                     return true;
-                System.out.println(curBlockDamageMP);
+                //System.out.println(curBlockDamageMP);
                 if (this.curBlockDamageMP >= 1.0F) {
                     this.isHittingBlock = false;
                     this.func_225324_a(CPlayerDiggingPacket.Action.STOP_DESTROY_BLOCK, posBlock, directionFacing);

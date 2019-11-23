@@ -19,4 +19,5 @@ public class HammerItem extends ToolItem {
     public int getMaxDamage(ItemStack stack) {
         return SiegeConfig.hammerDurability ? super.getMaxDamage(stack) : 0;
     }
+
 }

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -52,4 +53,12 @@ public class DefaultBlockProgress implements IBlockProgress {
 
     @Override
     public void sync(BlockPos pos, BlockInfo info) {}
+
+    @Override
+    public CompoundNBT serializeNBT() {
+        return new CompoundNBT();
+    }
+
+    @Override
+    public void deserializeNBT(CompoundNBT nbt) {}
 }

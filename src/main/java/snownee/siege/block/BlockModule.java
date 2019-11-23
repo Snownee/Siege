@@ -28,6 +28,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
+import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -44,6 +45,7 @@ import snownee.siege.block.capability.IBlockProgress;
 import snownee.siege.block.client.SiegePlayerController;
 import snownee.siege.block.impl.BlockInfo;
 import snownee.siege.block.network.SyncBlockInfoPacket;
+import snownee.siege.block.network.SyncBlockProgressPacket;
 
 @SuppressWarnings("unused")
 @KiwiModule(name = "block")
@@ -59,6 +61,7 @@ public class BlockModule extends AbstractModule {
     protected void init(FMLCommonSetupEvent event) {
         DefaultBlockProgress.register();
         NetworkChannel.register(SyncBlockInfoPacket.class, new SyncBlockInfoPacket.Handler());
+        NetworkChannel.register(SyncBlockProgressPacket.class, new SyncBlockProgressPacket.Handler());
         MinecraftForge.EVENT_BUS.register(BlockRecoverHandler.class);
     }
 
@@ -164,6 +167,11 @@ public class BlockModule extends AbstractModule {
         GameType gameType = mc.playerController.getCurrentGameType();
         mc.playerController = new SiegePlayerController(mc, mc.getConnection());
         mc.playerController.setGameType(gameType);
+    }
+
+    @SubscribeEvent
+    public void playerWatchChunk(ChunkWatchEvent.Watch event) {
+        new SyncBlockProgressPacket().send(event.getWorld().getChunk(event.getPos().x, event.getPos().z), event.getPlayer());
     }
 
 }
