@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.function.BiFunction;
 
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 import net.thesilkminer.mc.fermion.asm.api.descriptor.ClassDescriptor;
 import net.thesilkminer.mc.fermion.asm.api.descriptor.MethodDescriptor;
@@ -21,7 +22,7 @@ public final class WorldRendererTransformer extends SingleTargetMethodTransforme
                         .setDescription("Disable auto cleanup of damaged blocks.")
                         .build(),
                 ClassDescriptor.of("net.minecraft.client.renderer.WorldRenderer"),
-                MethodDescriptor.of("tick",
+                MethodDescriptor.of("func_72734_e", // tick
                         Collections.EMPTY_LIST,
                         ClassDescriptor.of(void.class))
         );
@@ -31,37 +32,15 @@ public final class WorldRendererTransformer extends SingleTargetMethodTransforme
     @Override
     protected BiFunction<Integer, MethodVisitor, MethodVisitor> getMethodVisitorCreator() {
         return (v, mv) -> new MethodVisitor(v, mv) {
-
-            private boolean visit = true;
-
-            @Override
-            public void visitLineNumber(int line, org.objectweb.asm.Label start) {
-                visit = line != 944;
-                super.visitLineNumber(line, start);
-            }
-
-            @Override
-            public void visitInsn(int opcode) {
-                if (visit)
-                    super.visitInsn(opcode);
-            }
-
-            @Override
-            public void visitVarInsn(int opcode, int var) {
-                if (visit)
-                    super.visitVarInsn(opcode, var);
-            }
+            private boolean visited = false;
 
             @Override
             public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
-                if (visit)
-                    super.visitFieldInsn(opcode, owner, name, descriptor);
-            }
-
-            @Override
-            public void visitMethodInsn(int opcode, String owner, String name, String descriptor, boolean isInterface) {
-                if (visit)
-                    super.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
+                super.visitFieldInsn(opcode, owner, name, descriptor);
+                if (!visited && opcode == Opcodes.PUTFIELD && "net/minecraft/client/renderer/WorldRenderer".equals(owner) && "I".equals(descriptor)) {
+                    super.visitInsn(Opcodes.RETURN);
+                    visited = true;
+                }
             }
         };
     }

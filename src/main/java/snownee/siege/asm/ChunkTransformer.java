@@ -23,7 +23,7 @@ public final class ChunkTransformer extends SingleTargetMethodTransformer {
                         .setDescription("Add hook when blockstate changed.")
                         .build(),
                 ClassDescriptor.of("net.minecraft.world.chunk.Chunk"),
-                MethodDescriptor.of("setBlockState",
+                MethodDescriptor.of("func_177436_a", // setBlockState
                         ImmutableList.of(
                                 ClassDescriptor.of("net.minecraft.util.math.BlockPos"),
                                 ClassDescriptor.of("net.minecraft.block.BlockState"),
@@ -36,15 +36,18 @@ public final class ChunkTransformer extends SingleTargetMethodTransformer {
     @Override
     protected BiFunction<Integer, MethodVisitor, MethodVisitor> getMethodVisitorCreator() {
         return (v, mv) -> new MethodVisitor(v, mv) {
+            private boolean visited = false;
+
             @Override
-            public void visitLineNumber(int line, org.objectweb.asm.Label start) {
-                super.visitLineNumber(line, start);
-                if (line == 298) {
+            public void visitFieldInsn(int opcode, String owner, String name, String descriptor) {
+                super.visitFieldInsn(opcode, owner, name, descriptor);
+                if (!visited && opcode == Opcodes.PUTFIELD && "net/minecraft/world/chunk/Chunk".equals(owner) && "Z".equals(descriptor)) {
                     super.visitVarInsn(Opcodes.ALOAD, 0);
                     super.visitVarInsn(Opcodes.ALOAD, 1);
                     super.visitVarInsn(Opcodes.ALOAD, 9);
                     super.visitVarInsn(Opcodes.ALOAD, 2);
                     super.visitMethodInsn(Opcodes.INVOKESTATIC, "snownee/siege/block/BlockModule", "onBlockAdded", "(Lnet/minecraft/world/chunk/Chunk;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;)V", false);
+                    visited = true;
                 }
             }
         };

@@ -7,6 +7,7 @@ import org.objectweb.asm.Opcodes;
 
 import com.google.common.collect.ImmutableList;
 
+import net.thesilkminer.mc.fermion.asm.api.MappingUtilities;
 import net.thesilkminer.mc.fermion.asm.api.descriptor.ClassDescriptor;
 import net.thesilkminer.mc.fermion.asm.api.descriptor.MethodDescriptor;
 import net.thesilkminer.mc.fermion.asm.api.transformer.TransformerData;
@@ -23,7 +24,7 @@ public final class ExplosionTransformer extends SingleTargetMethodTransformer {
                         .setDescription("Replace the default explosion with our own one.")
                         .build(),
                 ClassDescriptor.of(className),
-                MethodDescriptor.of("createExplosion",
+                MethodDescriptor.of("func_217401_a", // createExplosion
                         ImmutableList.of(
                                 ClassDescriptor.of("net.minecraft.entity.Entity"),
                                 ClassDescriptor.of("net.minecraft.util.DamageSource"),
