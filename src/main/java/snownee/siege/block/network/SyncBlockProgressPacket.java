@@ -25,7 +25,11 @@ public class SyncBlockProgressPacket extends Packet {
     public void send(Chunk chunk) {
         this.chunkX = chunk.getPos().x;
         this.chunkZ = chunk.getPos().z;
-        chunk.getCapability(SiegeCapabilities.BLOCK_PROGRESS).ifPresent($ -> this.data = $.serializeNBT());
+        chunk.getCapability(SiegeCapabilities.BLOCK_PROGRESS).ifPresent($ -> {
+            if ($.isInitialized()) {
+                this.data = $.serializeNBT();
+            }
+        });
         if (data != null) {
             NetworkChannel.INSTANCE.channel.send(PacketDistributor.TRACKING_CHUNK.with(() -> chunk), this);
         }
@@ -34,7 +38,11 @@ public class SyncBlockProgressPacket extends Packet {
     public void send(Chunk chunk, ServerPlayerEntity player) {
         this.chunkX = chunk.getPos().x;
         this.chunkZ = chunk.getPos().z;
-        chunk.getCapability(SiegeCapabilities.BLOCK_PROGRESS).ifPresent($ -> this.data = $.serializeNBT());
+        chunk.getCapability(SiegeCapabilities.BLOCK_PROGRESS).ifPresent($ -> {
+            if ($.isInitialized()) {
+                this.data = $.serializeNBT();
+            }
+        });
         if (data != null) {
             NetworkChannel.INSTANCE.channel.send(PacketDistributor.PLAYER.with(() -> player), this);
         }

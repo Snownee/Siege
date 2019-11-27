@@ -44,6 +44,6 @@ public class BlockInfo {
     }
 
     public int getProgressInt() {
-        return MathHelper.floor(progress * 10) - 1;
+        return MathHelper.ceil(progress * 10) - 1;
     }
 }

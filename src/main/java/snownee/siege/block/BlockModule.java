@@ -129,6 +129,9 @@ public class BlockModule extends AbstractModule {
             return;
         }
         chunk.getCapability(SiegeCapabilities.BLOCK_PROGRESS).ifPresent(data -> {
+            if (!data.isInitialized()) {
+                return;
+            }
             data.getInfo(pos).ifPresent(info -> {
                 if (chunk.getWorld().isRemote && info.breakerID < 0) {
                     sendBreakAnimation(info.breakerID, pos, -1);
@@ -141,6 +144,7 @@ public class BlockModule extends AbstractModule {
     @OnlyIn(Dist.CLIENT)
     public static void sendBreakAnimation(int breakerID, BlockPos pos, int progress) {
         Minecraft mc = Minecraft.getInstance();
+        //System.out.println(progress + " " + pos + " " + breakerID);
         mc.runAsync(() -> mc.world.sendBlockBreakProgress(breakerID, pos, progress));
     }
 
@@ -167,6 +171,16 @@ public class BlockModule extends AbstractModule {
         GameType gameType = mc.playerController.getCurrentGameType();
         mc.playerController = new SiegePlayerController(mc, mc.getConnection());
         mc.playerController.setGameType(gameType);
+    }
+
+    @SubscribeEvent
+    @OnlyIn(Dist.CLIENT)
+    public void playerLogOut(ClientPlayerNetworkEvent.LoggedOutEvent event) {
+        if (event.getPlayer() == null) {
+            return;
+        }
+        Minecraft mc = Minecraft.getInstance();
+        mc.worldRenderer.damagedBlocks.clear();
     }
 
     @SubscribeEvent

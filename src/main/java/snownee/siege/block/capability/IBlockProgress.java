@@ -32,4 +32,9 @@ public interface IBlockProgress extends INBTSerializable<CompoundNBT> {
 
     void sync(BlockPos pos, BlockInfo info);
 
+    default void clear() {};
+
+    default boolean isInitialized() {
+        return true;
+    }
 }

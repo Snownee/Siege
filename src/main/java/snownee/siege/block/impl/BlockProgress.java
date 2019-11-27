@@ -18,22 +18,27 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.fml.SidedProvider;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import snownee.siege.SiegeConfig;
 import snownee.siege.block.BlockModule;
 import snownee.siege.block.capability.DefaultBlockInfo;
 import snownee.siege.block.capability.IBlockProgress;
 import snownee.siege.block.network.SyncBlockInfoPacket;
+import snownee.siege.block.network.SyncBlockProgressPacket;
 
 public class BlockProgress implements IBlockProgress {
 
     private final Map<BlockPos, BlockInfo> progressData = Maps.newConcurrentMap();
     private final Chunk chunk;
+    private boolean initialized;
 
     public BlockProgress(Chunk chunk) {
         this.chunk = chunk;
+        System.out.println(chunk.getPos());
     }
 
     @Override
@@ -41,7 +46,11 @@ public class BlockProgress implements IBlockProgress {
         CompoundNBT data = new CompoundNBT();
         if (!progressData.isEmpty()) {
             ListNBT list = new ListNBT();
-            progressData.forEach((k, v) -> list.add(writeInfo(k, v)));
+            progressData.forEach((k, v) -> {
+                if (v.getProgress() > 0) {
+                    list.add(writeInfo(k, v));
+                }
+            });
             data.put("infos", list);
         }
         return data;
@@ -49,9 +58,11 @@ public class BlockProgress implements IBlockProgress {
 
     @Override
     public void deserializeNBT(CompoundNBT data) {
+        clear();
         if (!data.contains("infos", Constants.NBT.TAG_LIST)) {
             return;
         }
+        boolean dedicated = FMLEnvironment.dist == Dist.DEDICATED_SERVER;
         boolean remote = chunk.getWorld().isRemote;
         data.getList("infos", Constants.NBT.TAG_COMPOUND).forEach(v -> {
             Pair<BlockPos, BlockInfo> pair = readInfo((CompoundNBT) v);
@@ -60,6 +71,25 @@ public class BlockProgress implements IBlockProgress {
                 BlockModule.sendBreakAnimation(pair.getValue().breakerID, pair.getLeft(), pair.getValue().getProgressInt());
             }
         });
+        if (!initialized && !remote && dedicated) {
+            //new SyncBlockProgressPacket().send(chunk);
+        }
+        initialized = true;
+    }
+
+    @Override
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    @Override
+    public void clear() {
+        progressData.forEach((pos, info) -> {
+            if (chunk.getWorld().isRemote && info.breakerID < 0) {
+                BlockModule.sendBreakAnimation(info.breakerID, pos, -1);
+            }
+        });
+        progressData.clear();
     }
 
     public static CompoundNBT writeInfo(BlockPos pos, BlockInfo info) {

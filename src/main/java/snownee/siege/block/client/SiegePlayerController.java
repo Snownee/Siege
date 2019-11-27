@@ -14,10 +14,13 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import snownee.siege.block.BlockModule;
 import snownee.siege.block.SiegeInteractionManager;
 import snownee.siege.block.impl.BlockInfo;
 
+@OnlyIn(Dist.CLIENT)
 public class SiegePlayerController extends PlayerController {
 
     private boolean repairing;
